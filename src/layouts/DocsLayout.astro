@@ -13,49 +13,55 @@ interface Props {
 const { title, description, currentSlug, headings = [] } = Astro.props;
 
 const navGroups = [
+  { isSectionHeader: true, title: 'For Researchers' },
   {
-    title: 'Getting Started',
-    items: [
-      { label: 'Introduction', slug: 'getting-started/introduction' },
-      { label: 'Architecture', slug: 'getting-started/architecture' },
-      { label: 'Quick Start', slug: 'getting-started/quick-start' }
-    ]
-  },
-  {
-    title: 'Engine & ECS (Bevy)',
-    items: [
-      { label: 'Core ECS Design', slug: 'engine-ecs/core-design' },
-      { label: 'Agent Components', slug: 'engine-ecs/agent-components' },
-      { label: 'Grid Structures', slug: 'engine-ecs/grid-structures' }
-    ]
+    title: 'Overview',
+    items: [{ label: 'Introduction', slug: 'researchers/introduction' }]
   },
   {
     title: 'MAPF Solvers',
     items: [
-      { label: 'A*', slug: 'solvers/astar' },
-      { label: 'CBS', slug: 'solvers/cbs' },
-      { label: 'PIBT', slug: 'solvers/pibt' },
-      { label: 'LaCAM', slug: 'solvers/lacam' }
+      { label: 'A*', slug: 'researchers/solvers/astar' },
+      { label: 'CBS', slug: 'researchers/solvers/cbs' },
+      { label: 'PIBT', slug: 'researchers/solvers/pibt' },
+      { label: 'LaCAM', slug: 'researchers/solvers/lacam' },
     ]
   },
   {
     title: 'Fault Mechanics',
     items: [
-      { label: 'Chaos Engineering', slug: 'fault-engine/chaos-engineering' },
-      { label: 'Breakdown Faults', slug: 'fault-engine/breakdown-faults' },
-      { label: 'Heat Mechanics', slug: 'fault-engine/heat-faults' }
+      { label: 'Chaos Engineering', slug: 'researchers/fault-mechanics/chaos-engineering' },
+      { label: 'Breakdown Faults', slug: 'researchers/fault-mechanics/breakdown-faults' },
+      { label: 'Heat Mechanics', slug: 'researchers/fault-mechanics/heat-faults' },
     ]
   },
   {
     title: 'Scenarios',
     items: [
-      { label: 'Scenario Loading', slug: 'scenarios/scenario-loading' },
-      { label: 'Replays', slug: 'scenarios/deterministic-replays' }
+      { label: 'Scenario Loading', slug: 'researchers/scenarios/scenario-loading' },
+      { label: 'Replays', slug: 'researchers/scenarios/deterministic-replays' },
     ]
-  }
+  },
+
+  { isSectionHeader: true, title: 'For Developers' },
+  {
+    title: 'Getting Started',
+    items: [
+      { label: 'Architecture', slug: 'developers/getting-started/architecture' },
+      { label: 'Quick Start', slug: 'developers/getting-started/quick-start' },
+    ]
+  },
+  {
+    title: 'Engine & ECS (Bevy)',
+    items: [
+      { label: 'Core ECS Design', slug: 'developers/engine-ecs/core-design' },
+      { label: 'Agent Components', slug: 'developers/engine-ecs/agent-components' },
+      { label: 'Grid Structures', slug: 'developers/engine-ecs/grid-structures' },
+    ]
+  },
 ];
 
-const flatItems = navGroups.flatMap(g => g.items);
+const flatItems = navGroups.filter(g => !g.isSectionHeader).flatMap(g => g.items);
 const currentIndex = flatItems.findIndex(i => i.slug === currentSlug);
 
 const prevPage = currentIndex > 0 ? flatItems[currentIndex - 1] : null;
@@ -82,6 +88,13 @@ const nextPage = currentIndex !== -1 && currentIndex < flatItems.length - 1 ? fl
         </div>
         
         {navGroups.map(group => {
+          if (group.isSectionHeader) {
+            return (
+              <div class="sidebar-section-header">
+                <span>{group.title}</span>
+              </div>
+            );
+          }
           // Auto-expand the category if one of its items is the current page
           const hasActive = group.items.some(item => currentSlug === item.slug);
           return (
@@ -95,8 +108,8 @@ const nextPage = currentIndex !== -1 && currentIndex < flatItems.length - 1 ? fl
                   const isActive = currentSlug === item.slug;
                   return (
                     <li>
-                      <a 
-                        href={`/docs/${item.slug}`} 
+                      <a
+                        href={`/docs/${item.slug}`}
                         class={`sidebar-link ${isActive ? 'active' : ''}`}
                       >
                         {item.label}
@@ -346,6 +359,25 @@ const nextPage = currentIndex !== -1 && currentIndex < flatItems.length - 1 ? fl
   }
   :global(.pagefind-ui .pagefind-ui__result-excerpt) {
     font-family: var(--sans) !important;
+  }
+
+  .sidebar-section-header {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--dark);
+    font-weight: 600;
+    padding: 20px 0 8px 0;
+    margin-top: 8px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-section-header:first-child {
+    border-top: none;
+    padding-top: 0;
   }
 
   .sidebar-group {
