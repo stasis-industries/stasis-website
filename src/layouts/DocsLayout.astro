@@ -210,11 +210,13 @@ const nextPage = currentIndex !== -1 && currentIndex < flatItems.length - 1 ? fl
       } catch(e) {}
     }
 
-    // 2. Mobile Menu Toggle
+    // 2. Mobile Menu Toggle (clone-and-replace to prevent duplicate listeners)
     const menuBtn = document.getElementById('docs-menu-btn');
     const sidebar = document.getElementById('docs-sidebar');
     if (menuBtn && sidebar) {
-      menuBtn.addEventListener('click', () => {
+      const newBtn = menuBtn.cloneNode(true);
+      menuBtn.parentNode.replaceChild(newBtn, menuBtn);
+      newBtn.addEventListener('click', () => {
         sidebar.classList.toggle('open');
       });
       // Close when clicking a link on mobile
