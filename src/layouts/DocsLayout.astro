@@ -19,27 +19,44 @@ const navGroups = [
     items: [{ label: 'Introduction', slug: 'researchers/introduction' }]
   },
   {
+    title: 'Observatory',
+    items: [
+      { label: 'Simulation Phases', slug: 'researchers/observatory/simulation-phases' },
+      { label: 'Resilience Scorecard', slug: 'researchers/observatory/resilience-scorecard' },
+    ]
+  },
+  {
+    title: 'Metrics',
+    items: [
+      { label: 'Fault Metrics', slug: 'researchers/metrics/fault-metrics' },
+    ]
+  },
+  {
     title: 'MAPF Solvers',
     items: [
-      { label: 'A*', slug: 'researchers/solvers/astar' },
-      { label: 'CBS', slug: 'researchers/solvers/cbs' },
       { label: 'PIBT', slug: 'researchers/solvers/pibt' },
-      { label: 'LaCAM', slug: 'researchers/solvers/lacam' },
+      { label: 'Spacetime A*', slug: 'researchers/solvers/astar' },
     ]
   },
   {
     title: 'Fault Mechanics',
     items: [
-      { label: 'Chaos Engineering', slug: 'researchers/fault-mechanics/chaos-engineering' },
-      { label: 'Breakdown Faults', slug: 'researchers/fault-mechanics/breakdown-faults' },
-      { label: 'Heat Mechanics', slug: 'researchers/fault-mechanics/heat-faults' },
+      { label: 'Fault Types', slug: 'researchers/fault-mechanics/chaos-engineering' },
+      { label: 'Cascade Propagation', slug: 'researchers/fault-mechanics/breakdown-faults' },
+      { label: 'Heat System', slug: 'researchers/fault-mechanics/heat-faults' },
+    ]
+  },
+  {
+    title: 'Schedulers',
+    items: [
+      { label: 'Task Scheduling', slug: 'researchers/schedulers/task-scheduling' },
     ]
   },
   {
     title: 'Scenarios',
     items: [
-      { label: 'Scenario Loading', slug: 'researchers/scenarios/scenario-loading' },
-      { label: 'Replays', slug: 'researchers/scenarios/deterministic-replays' },
+      { label: 'Configuration', slug: 'researchers/scenarios/scenario-loading' },
+      { label: 'Tick Rewind', slug: 'researchers/scenarios/deterministic-replays' },
     ]
   },
 
@@ -52,11 +69,18 @@ const navGroups = [
     ]
   },
   {
-    title: 'Engine & ECS (Bevy)',
+    title: 'Engine & ECS',
     items: [
-      { label: 'Core ECS Design', slug: 'developers/engine-ecs/core-design' },
+      { label: 'Core Design', slug: 'developers/engine-ecs/core-design' },
       { label: 'Agent Components', slug: 'developers/engine-ecs/agent-components' },
       { label: 'Grid Structures', slug: 'developers/engine-ecs/grid-structures' },
+      { label: 'Task Scheduler', slug: 'developers/engine-ecs/task-scheduler' },
+    ]
+  },
+  {
+    title: 'Contributing',
+    items: [
+      { label: 'Adding Solvers', slug: 'developers/contributing/adding-solvers' },
     ]
   },
 ];

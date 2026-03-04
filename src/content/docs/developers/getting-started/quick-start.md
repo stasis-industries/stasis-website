@@ -1,43 +1,80 @@
 ---
 title: Quick Start
-description: Prerequisites, build commands, and how to run the MAFIS Rust/WASM simulator locally in under five minutes.
+description: Prerequisites, build commands, and how to run the MAFIS Rust/WASM simulator locally.
 ---
 
-Follow these steps to build and run the MAFIS simulator locally on your machine.
+Follow these steps to build and run the MAFIS simulator locally.
 
 ## Prerequisites
 
-Ensure you have the following installed on your system:
-- **Rust & Cargo** (Latest stable toolchain)
-- Any native dependencies required by **Bevy** (e.g., Alsa, udev, Wayland on Linux; typically bundled on Windows/macOS).
+- **Rust** (latest stable toolchain via `rustup`)
+- **wasm-bindgen-cli** — `cargo install wasm-bindgen-cli`
+- **basic-http-server** — `cargo install basic-http-server`
+- The `wasm32-unknown-unknown` target — `rustup target add wasm32-unknown-unknown`
 
-## 1. Clone the Simulator Repository
+On Linux, Bevy requires some native libraries (alsa, udev, wayland). On macOS and Windows these are typically available without extra steps.
 
-Clone the project from GitHub and navigate into the root directory:
+## Clone the Simulator Repository
 
 ```bash
 git clone https://github.com/stasisai/mafis.git
 cd mafis
 ```
 
-*(Note: Replace with your exact repository URL if different).*
+## Development Workflow
 
-## 2. Compile and Run the Engine
-
-Because MAFIS is built natively in Rust and uses Bevy Engine, you do not need node modules or WebAssembly compilers. Simply use standard cargo commands.
-
-To test the default simulation scene:
+For iterating on logic without a WASM build:
 
 ```bash
-cargo run --release
+cargo check          # Type and borrow check (~5s)
+cargo test           # Run all unit and integration tests (~7s)
 ```
 
-Using `--release` is highly recommended for any performance measurements or high-density agent counts, as the Rust compiler optimizations dramatically reduce pathfinding calculation times.
-
-## 3. Passing Configuration Parameters
-
-You can pass arguments to control map loading, algorithms, or fault injection. Check the help command out of the box:
+## WASM Build (Full Simulator)
 
 ```bash
-cargo run --release -- --help
+# 1. Compile to WASM (~2–3 min)
+cargo build --release --target wasm32-unknown-unknown
+
+# 2. Generate JS bindings
+wasm-bindgen --out-dir web --target web \
+  target/wasm32-unknown-unknown/release/mapf-fis-3d.wasm
+
+# 3. Serve locally
+basic-http-server web
 ```
+
+The simulator is now running at `http://localhost:4000`.
+
+## Directory Structure After Build
+
+```
+web/
+  index.html       HTML shell with Bevy canvas
+  app.js           JS control layer (UI bindings, bridge polling)
+  styles.css       UI styling
+  mapf_fis_3d.js   Generated wasm-bindgen bindings
+  mapf_fis_3d_bg.wasm  Compiled WASM module
+```
+
+## Running the Simulator
+
+Open `http://localhost:4000`. The Bevy canvas occupies the central viewport. The HTML/CSS/JS control layer provides configuration panels, charts, and transport controls.
+
+**Default configuration:**
+- Solver: PIBT (lifelong mode, no toggle)
+- Scheduler: Random
+- Agents: 50
+- Grid: 32×32, ~20% obstacle density
+- Fault intensity: Low
+- Warmup: 200 ticks
+
+Press **Start** to begin. The header shows `WARMUP (tick/200)` during baseline collection, then `FAULTS ACTIVE (tick N)` once fault injection begins.
+
+## Integration with the Website
+
+The `web/` directory will be embedded into the `/simulator` page of the Astro website. The Bevy canvas is the central viewport; the surrounding HTML/CSS/JS controls are peripheral. When integrating:
+
+- Use the CSS variables defined in `src/layouts/Layout.astro` (`--bg`, `--surface`, `--text`, `--red`, `--green`, etc.)
+- Follow the "Scientific Instrument" aesthetic: no `border-radius` on buttons, no pure white backgrounds
+- All JS controls communicate with Rust exclusively via `get_simulation_state()` / `send_command()` — see [Architecture](/docs/developers/getting-started/architecture)
