@@ -1106,7 +1106,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
       .hero-content { padding: 0 24px; }
       .ecosystem-grid { grid-template-columns: 1fr; gap: 24px; }
       .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
-      .dark-section, .community-section { min-height: auto; padding: 64px 0; }
+      .dark-section, .community-section { min-height: 100dvh; padding: 64px 0; }
       .section-inner { padding: 48px 24px; }
 
       .pillar-row { flex-direction: row; align-items: flex-start; gap: 16px; padding: 20px 0; flex-wrap: nowrap; }
@@ -1119,8 +1119,8 @@ import CascadeScene from '../components/CascadeScene.jsx';
       /* Cascade: stack vertically */
       .cascade-layout { grid-template-columns: 1fr; gap: 32px; }
 
-      /* Gap section — fit in viewport */
-      .gap-section { padding: 80px 24px; min-height: auto; }
+      /* Gap section — at least one screen */
+      .gap-section { padding: 80px 24px; min-height: 100dvh; }
       .gap-text { margin-bottom: 24px; }
 
       /* Thesis section */
@@ -1210,6 +1210,86 @@ import CascadeScene from '../components/CascadeScene.jsx';
       /* Ecosystem mobile */
       .eco-card { padding: 24px; }
       .eco-bg-number { font-size: 5rem; right: -5px; bottom: -10px; }
+    }
+
+    /* ─── Desktop Viewport Lock (≥ 901px) ──────────────────── */
+    /* One section = exactly one screen. Mandatory snap.         */
+    @media (min-width: 901px) {
+      .snap-container { scroll-snap-type: y mandatory; }
+
+      /* Gap: remove excess padding, let flexbox center */
+      .gap-section { height: 100dvh; min-height: unset; padding: 0 64px; }
+
+      /* Thesis: center entire content group as a unit */
+      .thesis-section {
+        height: 100dvh; padding: 0; overflow: hidden;
+        scroll-snap-align: start;
+      }
+      .thesis-section .section-inner {
+        height: 100%; padding: 24px 32px;
+        display: flex; flex-direction: column;
+        justify-content: center; gap: 16px;
+      }
+      .thesis-section .thesis-text { margin-bottom: 0; flex-shrink: 0; }
+      .thesis-section .thesis-title { font-size: clamp(1.8rem, 3.2vw, 2.8rem); margin-bottom: 10px; }
+      .thesis-section .thesis-scenes { flex-shrink: 0; min-height: 0; margin: 0; }
+      .thesis-section .thesis-caption { margin-top: 0; flex-shrink: 0; }
+
+      /* Observatory: center entire content group, enlarge scorecard */
+      .observatory-section {
+        height: 100dvh; padding: 0; overflow: hidden;
+        scroll-snap-align: start;
+      }
+      .observatory-section .section-inner {
+        height: 100%; padding: 24px 32px;
+        display: flex; flex-direction: column;
+        justify-content: center; gap: 24px;
+      }
+      .observatory-section .observatory-text { margin-bottom: 0; flex-shrink: 0; }
+      .observatory-section .observatory-title { font-size: clamp(1.5rem, 2.8vw, 2.4rem); margin-bottom: 8px; }
+      .observatory-section .observatory-desc { font-size: 0.9rem; }
+      .observatory-section .observatory-timeline { flex-shrink: 0; min-height: 250px; margin: 0; width: 100%; }
+      .observatory-section .scorecard { flex-shrink: 0; padding: 24px 32px; max-width: 100%; width: 100%; }
+      .observatory-section .scorecard-title { margin-bottom: 12px; font-size: 11px; }
+      .observatory-section .scorecard-metric { padding: 12px 0; }
+      .observatory-section .scorecard-metric-label { font-size: 13px; }
+      .observatory-section .scorecard-metric-value { font-size: 15px; }
+
+      /* Cascade: vertically centered, scene height bounded */
+      .cascade-section {
+        height: 100dvh; padding: 0; overflow: hidden;
+        display: flex; align-items: center;
+        scroll-snap-align: start;
+      }
+      .cascade-section .section-inner { padding: 40px 32px; }
+      .cascade-section .cascade-scene { min-height: 0; max-height: calc(100dvh - 120px); overflow: hidden; }
+
+      /* Engine: icons, centered content, spacious metrics */
+      .dark-section { height: 100dvh; min-height: unset; }
+      .dark-section .section-inner { padding: 40px 32px; }
+      .dark-section .dark-title { font-size: clamp(1.5rem, 2.8vw, 2.4rem); margin-bottom: 20px; }
+      .dark-section .pillar-row { padding: 20px 0; }
+      .dark-section .pillar-icon { height: 64px; width: 64px; border-radius: 16px; }
+      .dark-section .stats-grid { margin-top: 40px; padding-top: 32px; border-top: 1px solid rgba(240,237,233,0.08); gap: 48px; }
+      .dark-section .stat { padding: 0 8px; }
+      .dark-section .stat-value { margin-bottom: 10px; }
+      .dark-section .stat-label { margin-bottom: 16px; }
+      .dark-section .bevy-credit { margin-top: 24px; font-size: 0.8rem; opacity: 0.3; }
+
+      /* Community: vertically centered, compact cards */
+      .community-section { height: 100dvh; padding: 0; display: flex; align-items: center; }
+      .community-section .section-inner { padding: 36px 32px; }
+      .community-section .community-title { font-size: clamp(1.4rem, 2.2vw, 1.8rem); margin-bottom: 12px; }
+      .community-section .community-intro { font-size: 0.88rem; margin-bottom: 20px; }
+      .community-section .eco-card { padding: 20px; }
+      .community-section .eco-text { font-size: 0.82rem; line-height: 1.5; margin-bottom: 12px; }
+    }
+
+    /* ─── Tablet (601–900px): sections fill at least one screen ─ */
+    @media (min-width: 601px) and (max-width: 900px) {
+      .thesis-section, .observatory-section, .cascade-section { min-height: 100dvh; }
+      .dark-section, .community-section { min-height: 100dvh; }
+      .gap-section { min-height: 100dvh; }
     }
 
     /* ─── Entrance Animations ────────────────────────────── */
