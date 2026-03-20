@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Step-by-step guide to install and run MAFIS — web, desktop, and CLI.
+description: Step-by-step guide to install and run MAFIS in web, desktop, and CLI modes.
 ---
 
 MAFIS runs in three modes. Pick the one that fits your workflow.
@@ -19,7 +19,7 @@ No installation needed. Open the simulator URL and start experimenting.
 
 ## Desktop (Native)
 
-The desktop version has full performance — parallel computation via rayon, the complete Egui panel interface, and no WASM size constraints.
+The desktop version has full performance: parallel computation via rayon, the complete Egui panel interface, and no WASM size constraints.
 
 ### Prerequisites
 
@@ -40,7 +40,7 @@ The desktop version has full performance — parallel computation via rayon, the
 cargo run --release
 ```
 
-That's it. The desktop app opens with the full Egui interface — simulation controls, solver selection, fault injection panels, charts, and the resilience scorecard.
+That's it. The desktop app opens with the full Egui interface: simulation controls, solver selection, fault injection panels, charts, and the resilience scorecard.
 
 ---
 

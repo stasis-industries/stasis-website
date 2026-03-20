@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Website for **Stasis** and its product **MAFIS** (Multi-Agent Fault Injection Simulator) — a Rust/Bevy/WASM simulator for chaos engineering in MAPF (Multi-Agent Path Finding) networks. This repo is the marketing site and documentation hub, not the simulator itself.
+Website for **Stasis** and its product **MAFIS** (Multi-Agent Fault Injection Simulator) :a Rust/Bevy/WASM simulator for chaos engineering in MAPF (Multi-Agent Path Finding) networks. This repo is the marketing site and documentation hub, not the simulator itself.
 
 MAFIS is a **research project** (not a thesis) by a 5th-year CS student. It may be submitted for peer review and potential publication.
 
@@ -26,16 +26,21 @@ npx playwright test --headed           # Run with visible browser
 **Framework**: Astro 5 (Static Site Generation) with `ClientRouter` for SPA-like view transitions.
 
 **Layouts**:
-- `src/layouts/Layout.astro` — Base layout. Defines all CSS variables (`:root` and `html.dark`), theme persistence script, SEO meta tags, Google Fonts loading.
-- `src/layouts/DocsLayout.astro` — Three-column docs layout (sidebar nav + content + TOC). Handles pagination, pagefind search integration, mobile off-canvas sidebar, and code block copy buttons.
+- `src/layouts/Layout.astro` :Base layout. Defines all CSS variables (`:root` and `html.dark`), theme persistence script, SEO meta tags, Google Fonts loading.
+- `src/layouts/DocsLayout.astro` :Three-column docs layout (sidebar nav + content + TOC). Handles pagination, pagefind search integration, mobile off-canvas sidebar, and code block copy buttons.
 
-**Pages**: `src/pages/` — Astro file-based routing. Docs use `[...slug].astro` with `getStaticPaths()` from the `docs` content collection. `/simulator`, `/blog`, `/about` are WIP draft pages.
+**Pages**: `src/pages/` :Astro file-based routing. Docs use `[...slug].astro` with `getStaticPaths()` from the `docs` content collection. `/blog` and `/about` are WIP draft pages. `/simulator` is live but shows an "unavailable" placeholder until JS detects that `/simulator/index.html` exists (injected by the WASM release workflow).
 
-**Content**: `src/content/docs/` — Markdown files for documentation. Schema defined in `src/content.config.ts` (title, description). Navigation structure is hardcoded in `DocsLayout.astro`'s `navGroups` array — new docs must be added there manually.
+**Content**: `src/content/docs/researchers/` :Markdown files for documentation (all under the `researchers/` prefix). Schema defined in `src/content.config.ts` (title, description). Navigation structure is hardcoded in `DocsLayout.astro`'s `navGroups` array :new docs must be added there manually.
 
 **Components**:
-- `src/components/Header.astro` — Fixed header (height: 70px, hardcoded). Handles theme toggle, mobile burger menu. Docs mobile sticky topbar uses `top: 70px`.
-- `src/components/KineticGrid.jsx` — React + @react-three/fiber 3D visualization on homepage. Implements A* pathfinding and PIBT-style agent simulation with fault injection wave propagation. Loaded via `client:only="react"`.
+- `src/components/Header.astro` :Fixed header (height: 70px, hardcoded). Handles theme toggle, mobile burger menu. Docs mobile sticky topbar uses `top: 70px`.
+- `src/components/KineticGrid.jsx` :React + @react-three/fiber 3D visualization on homepage hero. Implements A* pathfinding and PIBT-style agent simulation with fault injection wave propagation. Loaded via `client:only="react"`.
+- `src/components/CascadeScene.jsx` :Canvas 2D animation showing cascade fault propagation across a grid. Used in the homepage "cascade" section.
+- `src/components/ThesisScene.jsx` :Canvas 2D animation showing agent fault states (dead, rerouting, deadlocked) with a live sparkline. Used in homepage research section.
+- `src/components/ObservatoryTimeline.jsx` :Canvas 2D animation showing the dual-twin simulation phases (baseline vs fault-injection throughput curve). Used in homepage observatory section.
+
+All three Canvas components are vanilla 2D (no Three.js), use `useRef`/`useEffect` for animation loops, and respect the `html.dark` class for theme-aware colors.
 
 ## Styling Conventions
 
@@ -44,7 +49,7 @@ npx playwright test --headed           # Run with visible browser
 **Theme engine**: Light/Dark mode via `html.dark` class on `<html>`. In Astro components, target dark mode with `:global(html.dark) .my-class`. Theme state persists in `localStorage.theme` and survives view transitions via `astro:after-swap` event.
 
 **Design tokens** (CSS variables):
-- Backgrounds: `--bg`, `--surface` (never pure white/black — light uses `#F5F2EE`, dark uses `#111111`)
+- Backgrounds: `--bg`, `--surface` (never pure white/black :light uses `#F5F2EE`, dark uses `#111111`)
 - Text: `--text`, `--text-sec`, `--dark` (inverts between themes)
 - Borders: `--border`, `--dark-border`
 - Fonts: `--serif` (Playfair Display), `--mono` (DM Mono), `--sans` (Inter)
@@ -76,25 +81,28 @@ basic-http-server web                                                  # Serve o
 
 **Solvers**: PIBT, RHCR (PBS/PIBT-Window/Priority A*), Token Passing. All lifelong-capable. `LifelongSolver` trait in `src/solver/lifelong.rs`.
 
-**Schedulers**: Random, Closest-first. `TaskScheduler` trait in `src/core/task.rs`.
+**Schedulers**: Random, Closest-first, Balanced, RoundTrip. `TaskScheduler` trait in `src/core/task.rs`.
 
-**Topologies**: WarehouseTopology (S/M/L), OpenFloorTopology. `Topology` trait in `src/core/topology.rs`.
+**Topologies**: Warehouse Medium (32×21), Kiva Large (57×33), Sorting Center (40×20), Compact Grid (24×24). JSON files in `topologies/` with a `manifest.json`. `Topology` trait in `src/core/topology.rs`.
 
 **Dual-twin simulation**: Headless Baseline (instant, fault-free reference) → Fault Injection (live sim with faults active from tick 1, metrics computed as deltas from baseline). No warmup phase.
 
-**Resilience Scorecard**: Fault Tolerance (Milner 2023), NRR (Or 2025), Adaptability (Shannon entropy), Critical Time (Ghasemieh 2024).
+**Resilience Scorecard**: Fault Tolerance (Milner 2023), NRR (Or 2025), Fleet Utilization, Critical Time (Ghasemieh 2024).
 
 **Observatory identity**: MAFIS is a fault resilience observatory, not a solver benchmark. It measures how lifelong multi-agent systems degrade, recover, and adapt under faults.
 
 ## Documentation Structure
 
-Docs have two sections (no developer docs — kept simple):
+Docs have two sections (no developer docs :kept simple):
 
 **Getting Started**: Introduction, Installation
-**Research**: Observatory (Simulation Phases, Resilience Scorecard), Metrics (Fault Metrics), Fault Mechanics (Fault Types, Cascade Propagation, Heat System), Schedulers (Task Scheduling), Scenarios (Configuration, Tick Rewind)
+**Research**: Observatory (Simulation Phases, Resilience Scorecard), Metrics (Fault Metrics), Fault Mechanics (Fault Types, Cascade Propagation, Heat System), Schedulers (Task Scheduling :4 schedulers: Random, Closest-first, Balanced, RoundTrip), Scenarios (Configuration, Tick Rewind)
 
 Navigation is hardcoded in `DocsLayout.astro`'s `navGroups` array.
 
 ## CI/CD
 
-GitHub Actions (`.github/workflows/ci.yml`): `npm audit` security scan → build → Playwright E2E. Runs on push/PR to `main` and `dev`. Node 22.
+Two GitHub Actions workflows:
+
+- **`ci.yml`**: Runs on push/PR to `main` and `dev`. `npm audit` security scan → build → Playwright E2E (Chromium only, against the production build). Node 22.
+- **`rebuild-on-wasm.yml`**: Triggered by `repository_dispatch` from `stasis-industry/mafis` (event type `wasm-updated`) or manually. Downloads `mafis-wasm.tar.gz` from a GitHub release into `public/simulator/`, rebuilds, runs E2E tests, then deploys to Vercel production (`vercel deploy --prebuilt --prod`). Requires secrets: `SIMULATOR_READ_TOKEN`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.

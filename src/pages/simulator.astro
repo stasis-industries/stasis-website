@@ -3,11 +3,11 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout
-  title="MAFIS — Fault Resilience Observatory"
+  title="MAFIS | Fault Resilience Observatory"
   description="Run lifelong multi-agent pathfinding simulations in 3D, inject faults, and measure how warehouse robotics systems degrade and recover. Built in Rust, running in your browser."
 >
 
-  <!-- Unavailable state — shown until JS confirms /simulator/index.html exists -->
+  <!-- Unavailable state (shown until JS confirms /simulator/index.html exists) -->
   <div id="sim-unavailable">
     <div class="sim-content">
 
@@ -21,7 +21,7 @@ import Layout from '../layouts/Layout.astro';
       </h1>
 
       <p class="sim-desc">
-        The simulator is built — 29K lines of Rust, compiled to WebAssembly, running 5 lifelong MAPF solvers across 4 fault scenarios at 60fps. It deploys on the first tagged release.
+        29K lines of Rust compiled to WebAssembly. 5 lifelong MAPF solvers, 4 fault scenarios, 60fps. Deploys on the first tagged release.
       </p>
 
       <div class="sim-links">
@@ -36,13 +36,13 @@ import Layout from '../layouts/Layout.astro';
         <div class="spec-divider"></div>
         <div class="spec-item"><span class="spec-val">500</span><span class="spec-label">Max agents</span></div>
         <div class="spec-divider"></div>
-        <div class="spec-item"><span class="spec-val">2,520</span><span class="spec-label">Experiment runs</span></div>
+        <div class="spec-item"><span class="spec-val">2,700</span><span class="spec-label">Experiment runs</span></div>
       </div>
 
     </div>
   </div>
 
-  <!-- Live simulator — hidden until JS confirms the file exists -->
+  <!-- Live simulator (hidden until JS confirms the file exists) -->
   <iframe
     id="sim-frame"
     src="/simulator/index.html"

@@ -1,9 +1,9 @@
 ---
 title: Cascade Propagation
-description: How MAFIS traces the ripple effect of a fault through the agent fleet — the Agent Dependency Graph (ADG), BFS cascade, and replanning pipeline.
+description: "How MAFIS traces the ripple effect of a fault through the agent fleet: the Agent Dependency Graph (ADG), BFS cascade, and replanning pipeline."
 ---
 
-When a fault occurs — an agent dies, a cell becomes blocked — the agents whose paths cross the new obstacle cannot continue. But the disruption does not stop with those directly blocked agents. Their replanned paths may in turn block other agents, who block others still. This chain reaction is **cascade propagation**, and it is one of the core research outputs MAFIS is designed to measure.
+When a fault occurs (an agent dies, a cell becomes blocked), the agents whose paths cross the new obstacle cannot continue. But the disruption does not stop with those directly blocked agents. Their replanned paths may in turn block other agents, who block others still. This chain reaction is **cascade propagation**, and it is one of the core research outputs MAFIS is designed to measure.
 
 ## Agent Dependency Graph (ADG)
 
@@ -65,7 +65,7 @@ struct FaultEventRecord {
 
 ## Replan Phase
 
-After the cascade is computed, `FaultSet::Replan` triggers replanning for all affected agents. PIBT replans from current positions with the updated grid (which now reflects the new obstacle). Because PIBT is reactive and one-step-at-a-time, replanning is fast — typically 1–2ms for 500 agents.
+After the cascade is computed, `FaultSet::Replan` triggers replanning for all affected agents. PIBT replans from current positions with the updated grid (which now reflects the new obstacle). Because PIBT is reactive and one-step-at-a-time, replanning is fast, typically 1-2ms for 500 agents.
 
 The `FaultSet::Replan` phase runs after `FaultSet::FaultCheck` in every tick:
 
@@ -86,6 +86,6 @@ In lifelong mode, cascade depth and spread are driven primarily by **scheduler s
 - A scheduler that assigns tasks concentrating agents in narrow corridors produces high cascade depth (blocked agents form long chains) and high spread (many agents share the same chokepoint).
 - A scheduler that distributes agents broadly produces lower cascade depth and spread, at the cost of potentially lower baseline throughput.
 
-> [!TIP] This trade-off — baseline efficiency vs fault resilience — is the core research question MAFIS is designed to quantify. Two configurations can have identical baseline throughput but completely different cascade profiles, which only becomes visible under fault injection.
+> [!TIP] This trade-off, baseline efficiency vs fault resilience, is the core research question MAFIS is designed to quantify. Two configurations can have identical baseline throughput but completely different cascade profiles, which only becomes visible under fault injection.
 
 See [Fault Types](/docs/researchers/fault-mechanics/chaos-engineering) for the full fault taxonomy, and [Fault Metrics](/docs/researchers/metrics/fault-metrics) for the full set of metrics computed per event.

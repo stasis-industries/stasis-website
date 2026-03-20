@@ -253,7 +253,7 @@ const nextPage = currentIndex !== -1 && currentIndex < flatItems.length - 1 ? fl
           btn.classList.add('copied');
           setTimeout(() => btn.classList.remove('copied'), 2000);
         } catch (e) {
-          btn.title = 'Copy failed — try selecting manually';
+          btn.title = 'Copy failed, try selecting manually';
           setTimeout(() => { btn.title = 'Copy code'; }, 2000);
         }
       });

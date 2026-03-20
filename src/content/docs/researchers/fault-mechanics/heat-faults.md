@@ -1,9 +1,9 @@
 ---
 title: Heat System
-description: How heat accumulates per cell and per agent in MAFIS, triggers Overheat faults, and feeds the Adaptability resilience metric via heatmap entropy.
+description: How heat accumulates per agent in MAFIS, triggers Overheat faults, and produces heatmap visualizations of congestion.
 ---
 
-The heat system models thermal stress and congestion penalty in MAFIS. Heat builds up in areas of high agent density and waiting, eventually triggering Overheat faults that kill agents and create permanent obstacles. It also produces the heatmap used for the Adaptability resilience metric.
+The heat system models thermal stress and congestion penalty in MAFIS. Heat builds up in areas of high agent density and waiting, eventually triggering Overheat faults that kill agents and create permanent obstacles.
 
 ## Heat Accumulation
 
@@ -20,7 +20,7 @@ The `heat_per_wait` penalty is typically higher than `heat_per_move`. This ensur
 
 ## Overheat Threshold
 
-> [!WARNING] When an agent's heat exceeds `overheat_threshold`, the agent dies permanently. Tune `heat_per_wait` and `congestion_heat_bonus` carefully — dense corridors can trigger chain overheat events.
+> [!WARNING] When an agent's heat exceeds `overheat_threshold`, the agent dies permanently. Tune `heat_per_wait` and `congestion_heat_bonus` carefully, as dense corridors can trigger chain overheat events.
 
 When an agent's accumulated heat exceeds `overheat_threshold`, a `FaultType::Overheat` is triggered:
 
@@ -29,25 +29,20 @@ When an agent's accumulated heat exceeds `overheat_threshold`, a `FaultType::Ove
 3. Cascade pipeline fires (ADG → BFS → replan)
 4. `FaultEventRecord` created with `fault_type: FaultType::Overheat`
 
-Overheat faults are **automatic** — they are not externally injected but arise from the simulation dynamics. A scheduler that assigns tasks creating congestion hot spots will generate Overheat faults even at low `breakdown_probability` settings.
+Overheat faults are **automatic**. They are not externally injected but arise from the simulation dynamics. A scheduler that assigns tasks creating congestion hot spots will generate Overheat faults even at low `breakdown_probability` settings.
 
 ## Heatmap
 
-The heatmap is a spatial density grid. It accumulates agent presence over time and is updated each tick. Cells where agents frequently wait or pass through show high heatmap density; lightly trafficked cells show low density.
-
-The heatmap serves two purposes:
-
-1. **Visualization:** Real-time overlay in the 3D viewport showing congestion hot spots.
-2. **Adaptability metric:** Shannon entropy of the heatmap density is used to compute the Adaptability score. When a fault forces agents to reroute, heatmap entropy increases (traffic redistributes). When agents jam at a blockage, entropy stays concentrated (no adaptation). See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard).
+The heatmap is a spatial density grid updated each tick. It provides a real-time overlay in the 3D viewport showing congestion hot spots. Cells where agents frequently wait show high density; lightly trafficked cells show low density.
 
 ## Research Use
 
 The heat system creates a direct link between **scheduler strategy** and **fault generation rate**:
 
 - A scheduler that concentrates tasks in busy corridors will generate more Overheat faults per unit time than a scheduler that distributes load.
-- This means fault intensity is not just an external configuration knob — it emerges from the interaction between the scheduler and the map topology.
+- This means fault intensity is not just an external configuration knob. It emerges from the interaction between the scheduler and the map topology.
 
-> [!TIP] This emergent behavior is by design. The observatory does not want to inject artificial faults at a fixed rate and measure recovery. It wants to observe how the system's own dynamics create fault pressure — and how different configurations handle that pressure differently. This directly feeds the [Adaptability metric](/docs/researchers/observatory/resilience-scorecard#3-adaptability) via heatmap entropy.
+> [!TIP] This emergent behavior is by design. The observatory observes how the system's own dynamics create fault pressure, and how different configurations handle that pressure differently.
 
 ## Configuration
 
@@ -69,6 +64,6 @@ Default values are tuned so that at medium fault intensity, Overheat faults begi
 
 ## Code Location
 
-- `src/fault/heat.rs` — `accumulate_heat` system, `HeatmapState` resource
-- `src/fault/config.rs` — `FaultConfig` resource
-- `src/analysis/fault_metrics.rs` — heatmap entropy computation for Adaptability
+- `src/fault/heat.rs` : `accumulate_heat` system, `HeatmapState` resource
+- `src/fault/config.rs` : `FaultConfig` resource
+- `src/analysis/fault_metrics.rs` : fault metrics computation

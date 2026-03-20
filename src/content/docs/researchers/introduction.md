@@ -3,7 +3,7 @@ title: Introduction to MAFIS
 description: What MAFIS is, why lifelong fault resilience matters, and how to get started.
 ---
 
-**MAFIS** (Multi-Agent Fault Injection Simulator) is a **fault resilience observatory** for lifelong multi-agent path finding (MAPF). It measures how multi-agent systems degrade, recover, and adapt under real-world conditions — faults, congestion, and cascading failures — sustained over continuous operation.
+**MAFIS** (Multi-Agent Fault Injection Simulator) is a **fault resilience observatory** for lifelong multi-agent path finding (MAPF). It measures how multi-agent systems degrade, recover, and adapt under faults, congestion, and cascading failures sustained over continuous operation.
 
 MAFIS is a research project built in Rust using the Bevy engine, compiled to both WebAssembly (browser) and native desktop. It runs deterministic simulations where every fault event, cascade, and recovery is reproducible from a seed.
 
@@ -17,21 +17,21 @@ A system that performs "worse" in perfect conditions may be "better" under susta
 
 | Variable | Options |
 |---|---|
-| **Scheduler strategy** | Random, Closest-first |
+| **Scheduler strategy** | Random, Closest-first, Balanced, RoundTrip |
 | **Fault intensity** | Off / Low / Medium / High |
-| **Grid topology** | Warehouse (S/M/L), Open Floor, Custom |
+| **Grid topology** | Warehouse Medium, Kiva Large, Sorting Center, Compact Grid |
 | **Solver** | PIBT, RHCR (3 variants), Token Passing |
 
-The solver is typically held constant while the other variables are swept. The primary insight MAFIS is built to reveal: **scheduler strategy — not solver algorithm — determines fault resilience.**
+The solver is typically held constant while the other variables are swept. The primary insight MAFIS is built to reveal: **scheduler strategy, not solver algorithm, determines fault resilience.**
 
 ## Resilience Scorecard
 
 Every fault injection run produces a four-metric **Resilience Scorecard**:
 
-- **Fault Tolerance** — how much throughput is retained under faults (Milner 2023)
-- **NRR** — operational uptime ratio: recovery speed vs fault frequency (Or 2025)
-- **Adaptability** — does the system redistribute traffic after a fault
-- **Critical Time** — fraction of time spent in a critically degraded state (Ghasemieh 2024)
+- **Fault Tolerance** : throughput retained under faults (Milner 2023)
+- **NRR** : operational uptime ratio, recovery speed vs fault frequency (Or 2025)
+- **Fleet Utilization** : fraction of the fleet still productive after faults
+- **Critical Time** : fraction of time spent in a critically degraded state (Ghasemieh 2024)
 
 See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) for formulas and examples.
 
@@ -39,7 +39,7 @@ See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) f
 
 | | Web (WASM) | Desktop (Native) |
 |---|---|---|
-| **Install** | None — runs in browser | Download binary |
+| **Install** | None (runs in browser) | Download binary |
 | **Performance** | 500 agents, 60 FPS | 1000+ agents, parallel computation |
 | **Interface** | HTML/CSS/JS controls | Full Egui panel system |
 | **Use case** | Quick experiments, demos | Batch experiments, parameter sweeps |
@@ -58,8 +58,8 @@ A **CLI tool** (`mafis`) is also available for headless batch experiments and sc
 
 ## Getting Oriented
 
-- [Simulation Phases](/docs/researchers/observatory/simulation-phases) — headless baseline + fault injection
-- [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) — the four output metrics
-- [Fault Metrics](/docs/researchers/metrics/fault-metrics) — raw metrics with origins and examples
-- [Fault Types](/docs/researchers/fault-mechanics/chaos-engineering) — what can go wrong
-- [Installation](/docs/getting-started/installation) — step-by-step setup
+- [Simulation Phases](/docs/researchers/observatory/simulation-phases)
+- [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard)
+- [Fault Metrics](/docs/researchers/metrics/fault-metrics)
+- [Fault Types](/docs/researchers/fault-mechanics/chaos-engineering)
+- [Installation](/docs/getting-started/installation)

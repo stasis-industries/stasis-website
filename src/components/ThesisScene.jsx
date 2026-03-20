@@ -20,12 +20,12 @@ const COLORS = {
   sparklineRed: '#991B1B',
 };
 
-// Fault agent index in each layout — the agent starting at (5,5)
+// Fault agent index in each layout (the agent starting at (5,5))
 const FAULT_AGENT = { resilient: 8, fragile: 11 };
 
 // ─── Predetermined Agent Layouts ────────────────────────────────────
 function makeResilientAgents() {
-  // Evenly spread across grid — one agent at center (5,5)
+  // Evenly spread across grid, one agent at center (5,5)
   const positions = [
     [1,1],[3,1],[5,1],[8,2],
     [0,3],[4,3],[7,4],[9,4],
@@ -42,7 +42,7 @@ function makeResilientAgents() {
 }
 
 function makeFragileAgents() {
-  // Clustered in a central corridor — one agent at center (5,5)
+  // Clustered in a central corridor, one agent at center (5,5)
   const positions = [
     [3,2],[4,2],[5,2],[6,2],
     [3,3],[4,3],[5,3],[6,3],
@@ -190,7 +190,7 @@ function SingleGrid({ label, variant, isPlaying }) {
 
       agents.forEach(a => {
         if (a.state !== 'normal') return;
-        if (a.id === faultAgentIdx) return; // fault agent stays at center — same position on both grids
+        if (a.id === faultAgentIdx) return; // fault agent stays at center, same position on both grids
         const [dx, dy] = getMoveDelta(tick, a.id);
         const nx = clamp(a.x + dx, 0, GRID_SIZE - 1);
         const ny = clamp(a.y + dy, 0, GRID_SIZE - 1);
@@ -213,7 +213,7 @@ function SingleGrid({ label, variant, isPlaying }) {
         ctx.beginPath(); ctx.moveTo(0, i * cellPx); ctx.lineTo(gridPx, i * cellPx); ctx.stroke();
       }
 
-      // Agents (no tile highlight — fault is shown as a dead robot)
+      // Agents (no tile highlight, fault is shown as a dead robot)
       const agents = agentsRef.current;
       agents.forEach(a => {
         const t = Math.min(a.lerpT, 1);

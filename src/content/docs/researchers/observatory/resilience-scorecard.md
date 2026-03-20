@@ -1,6 +1,6 @@
 ---
 title: Resilience Scorecard
-description: Four research-backed metrics that characterize how a multi-agent system behaves under sustained faults — Fault Tolerance, NRR, Adaptability, and Critical Time.
+description: "Four research-backed metrics that characterize how a multi-agent system behaves under sustained faults: Fault Tolerance, NRR, Fleet Utilization, and Critical Time."
 ---
 
 The **Resilience Scorecard** is computed live during the fault injection phase. It distills raw metrics into four research-backed indicators that together answer: *is this system resilient, degrading, or collapsing?*
@@ -9,7 +9,7 @@ The **Resilience Scorecard** is computed live during the fault injection phase. 
 RESILIENCE SCORECARD
   Fault Tolerance    0.82
   NRR                0.91
-  Adaptability       0.64
+  Fleet Utilization  0.64
   Critical Time      0.15
 
   Composite Score    0.80  →  RESILIENT
@@ -31,15 +31,15 @@ $$FT = \frac{P_{\text{fault}}}{P_{\text{nominal}}}$$
 - **Range:** 0 (no throughput under faults) → 1+ (throughput matches or exceeds baseline)
 - **Weight in composite:** 30%
 
-**Origin:** Adapted from Milner (2023), *"Quantifying Fault Tolerance in Autonomous Multi-Robot Systems"* — defines fault tolerance as the ratio of degraded performance to nominal performance.
+**Origin:** Adapted from Milner (2023), *"Quantifying Fault Tolerance in Autonomous Multi-Robot Systems"*, which defines fault tolerance as the ratio of degraded performance to nominal performance.
 
 **Real-life example:** A warehouse fleet delivers 100 packages/hour normally. Under faults, it delivers 82/hour. FT = 0.82. A fleet manager uses this to decide: "Can I absorb a 3-robot failure during peak hours without missing SLAs?"
 
-> [!TIP] **Animation concept:** Two throughput bars side by side — a tall "baseline" bar and a shorter "under faults" bar. The ratio between them fills a gauge labeled "Fault Tolerance."
+> [!TIP] **Animation concept:** Two throughput bars side by side: a tall "baseline" bar and a shorter "under faults" bar. The ratio between them fills a gauge labeled "Fault Tolerance."
 
 ---
 
-## 2. NRR — Normalized Recovery Ratio
+## 2. NRR (Normalized Recovery Ratio)
 
 *How much time does the system spend recovering versus operating?*
 
@@ -54,33 +54,34 @@ $$NRR = 1 - \frac{MTTR}{MTBF}$$
 - **Weight in composite:** 25%
 - **Requires** at least 2 fault events to compute.
 
-**Origin:** Or (2025), *"MTTR-A: Measuring Cognitive Recovery Latency in Multi-Agent Systems"* — defines NRR as the uptime bound, proving that steady-state operational fraction satisfies $\pi_{up} \geq NRR$.
+**Origin:** Or (2025), *"MTTR-A: Measuring Cognitive Recovery Latency in Multi-Agent Systems"*, which defines NRR as the uptime bound, proving that steady-state operational fraction satisfies $\pi_{up} \geq NRR$.
 
-**Real-life example:** If a fleet takes 10 ticks to recover and faults occur every 100 ticks, NRR = 0.90 — the fleet is operational 90%+ of the time. If recovery takes 50 ticks with faults every 60 ticks, NRR = 0.17 — the fleet is almost always recovering and rarely productive.
+**Real-life example:** If a fleet takes 10 ticks to recover and faults occur every 100 ticks, NRR = 0.90, meaning the fleet is operational 90%+ of the time. If recovery takes 50 ticks with faults every 60 ticks, NRR = 0.17, meaning the fleet is almost always recovering and rarely productive.
 
 > [!TIP] **Animation concept:** A timeline with alternating green (operational) and red (recovering) segments. The ratio of green to total fills a gauge labeled "NRR." High NRR = mostly green.
 
 ---
 
-## 3. Adaptability
+## 3. Fleet Utilization (FU)
 
-*Does the system redistribute traffic after a fault?*
+*How much of the fleet remains productive after faults?*
 
-$$A = \frac{H(t)}{H_{\max}}$$
+$$FU = \frac{\text{alive} + \text{tasked agents (post-fault average)}}{\text{initial fleet size}}$$
 
 | Variable | Meaning |
 |---|---|
-| $H(t)$ | Shannon entropy of heatmap density at tick $t$ |
-| $H_{\max}$ | Maximum possible entropy: $\ln(\text{walkable cells})$ |
+| alive agents | Agents that have not been permanently disabled by faults |
+| tasked agents | Alive agents currently executing a pickup or delivery leg |
+| initial fleet size | Total agents at simulation start |
 
-- **Range:** 0 (all agents stuck in one area) → 1 (perfectly distributed across the grid)
+- **Range:** 0 (all agents dead or idle) → 1 (full fleet operational and productive)
 - **Weight in composite:** 25%
 
-**Origin:** Shannon entropy as a spatial distribution measure is standard in information theory. Applied here to measure whether agents redistribute to alternative routes after a fault blocks their primary path.
+**Interpretation:** Fleet Utilization separates two failure modes: agents killed by faults (fleet shrinkage) versus agents stalled by cascade effects (idle queuing). A system that loses few agents but sees widespread task stalls still scores low. A system that loses agents but immediately reassigns work to surviving agents scores high.
 
-**Real-life example:** A delivery corridor is blocked. If all robots queue behind the blockage (low entropy), the system is not adaptive. If they spread to alternative corridors (high entropy), throughput recovers faster. A fleet operator asks: "Will my system reroute or jam?"
+**Real-life example:** A warehouse fleet starts with 100 robots. A fault cascade kills 10 and stalls 20 more. FU = (90 alive, 70 tasked) / 100 = 0.70. A fleet manager asks: "After a fault, how much of my fleet is still doing useful work?" FU = 0.70 means 30 robots are either dead or blocked, a meaningful operational signal even if throughput partially recovers.
 
-> [!TIP] **Animation concept:** A grid heatmap. Before fault: agents clustered in corridors (hot spots). After fault: heat spreads across the grid as agents find new routes. An entropy gauge rises from low to high.
+> [!TIP] **Animation concept:** A fleet health bar showing alive agents (grey) and tasked agents (green) as a fraction of the original fleet. Faults chip away at the bar: dead agents turn red, stalled agents turn amber.
 
 ---
 
@@ -99,9 +100,9 @@ $$CT = \frac{t_{\text{below}}}{t_{\text{fault}}}$$
 - **Weight in composite:** 20% (inverted: $1 - CT$)
 - **Threshold:** 50% of baseline throughput
 
-**Origin:** Adapted from Ghasemieh (2024), *"Transient Analysis of Fault-Tolerant Systems"* — uses time-below-threshold as a measure of system criticality during transient degradation.
+**Origin:** Adapted from Ghasemieh (2024), *"Transient Analysis of Fault-Tolerant Systems"*, which uses time-below-threshold as a measure of system criticality during transient degradation.
 
-**Real-life example:** After a cascade failure, throughput drops to 30% of baseline for 45 out of 300 ticks. CT = 0.15. A reliability engineer asks: "How often is my system dangerously degraded?" CT = 0.15 means "only 15% of the time" — acceptable. CT = 0.60 means "more often than not" — redesign needed.
+**Real-life example:** After a cascade failure, throughput drops to 30% of baseline for 45 out of 300 ticks. CT = 0.15. A reliability engineer asks: "How often is my system dangerously degraded?" CT = 0.15 means "only 15% of the time," which is acceptable. CT = 0.60 means "more often than not," and redesign is needed.
 
 > [!TIP] **Animation concept:** A throughput curve over time with a dashed red line at 50% baseline. The segments below the line flash red. CT = the red fraction of the total timeline.
 
@@ -111,7 +112,7 @@ $$CT = \frac{t_{\text{below}}}{t_{\text{fault}}}$$
 
 The four metrics combine into a single resilience score:
 
-$$\text{Score} = 0.30 \times FT + 0.25 \times NRR + 0.25 \times A + 0.20 \times (1 - CT)$$
+$$\text{Score} = 0.30 \times FT + 0.25 \times NRR + 0.25 \times FU + 0.20 \times (1 - CT)$$
 
 The verdict banner classifies the result:
 

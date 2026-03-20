@@ -147,7 +147,7 @@ export default function CascadeScene() {
         setCascadeSpread(1);
       }
 
-      // Phase 2: Cascade spreads — exactly 1 level per tick, stops after CASCADE_LEVELS
+      // Phase 2: Cascade spreads, exactly 1 level per tick, stops after CASCADE_LEVELS
       const ticksSinceFault = tick - FAULT_TICK;
       if (faultProcessed && ticksSinceFault > 0 && ticksSinceFault <= CASCADE_LEVELS) {
         const faultAgent = agents[FAULT_AGENT_ID];
@@ -169,7 +169,7 @@ export default function CascadeScene() {
         if (newSpread > peakSpread) { peakSpread = newSpread; setCascadeSpread(peakSpread); }
       }
 
-      // Phase 3: Recovery — cascade→rerouting, then rerouting→normal
+      // Phase 3: Recovery, cascade→rerouting, then rerouting→normal
       if (faultProcessed && tick >= RECOVERY_START) {
         const recoveryTick = tick - RECOVERY_START;
         if (recoveryTick === 0) {

@@ -7,7 +7,7 @@ import ObservatoryTimeline from '../components/ObservatoryTimeline.jsx';
 import CascadeScene from '../components/CascadeScene.jsx';
 ---
 
-<Layout title="MAFIS by Stasis — Fault Resilience Observatory">
+<Layout title="MAFIS by Stasis | Fault Resilience Observatory">
 
   <Header />
 
@@ -32,7 +32,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
           </h1>
           <p class="hero-subtitle">
             MAFIS is a fault resilience observatory for lifelong multi-agent systems.
-            It measures what benchmarks can't — how fleets degrade, recover, and adapt
+            It measures what benchmarks ignore: how fleets degrade, recover, and adapt
             under real-world faults.
           </p>
           <div class="hero-cta">
@@ -57,10 +57,10 @@ import CascadeScene from '../components/CascadeScene.jsx';
           Existing tools compare solver speed on static grids with no failures,
           no congestion, and no sustained operation. But no warehouse runs
           without faults. No fleet operates in ideal conditions. No benchmark
-          answers the question that matters most —
+          answers the question that matters most:
         </p>
         <blockquote class="gap-quote">
-          "What happens to your fleet when things go wrong —
+          "What happens to your fleet when things go wrong,
            and keep going wrong?"
         </blockquote>
       </div>
@@ -118,7 +118,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
             <span class="scorecard-metric-value sc-blue"><span class="counter" data-target="91" data-start="0" data-format="decimal">0</span></span>
           </div>
           <div class="scorecard-metric">
-            <span class="scorecard-metric-label">Adaptability</span>
+            <span class="scorecard-metric-label">Fleet Utilization</span>
             <span class="scorecard-metric-value sc-orange"><span class="counter" data-target="64" data-start="0" data-format="decimal">0</span></span>
           </div>
           <div class="scorecard-metric">
@@ -138,9 +138,9 @@ import CascadeScene from '../components/CascadeScene.jsx';
             <h2 class="cascade-title">One fault. Twenty-three agents <em>affected.</em></h2>
             <p class="cascade-desc">
               When an agent dies, it becomes a permanent obstacle. Agents behind
-              it replan — but their new paths block others, who block others still.
-              MAFIS traces this chain reaction in real time and measures exactly
-              how deep and how wide the damage spreads.
+              it replan, but their new paths block others, who block others still.
+              MAFIS traces this chain reaction and measures how deep and wide
+              the damage spreads.
             </p>
           </div>
 
@@ -174,7 +174,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
                 <span class="pillar-line" style="background:#3DB8E8;"></span>Entity Component System
               </h3>
               <p class="pillar-text">
-                Built on <a href="https://bevyengine.org/" target="_blank" rel="noopener noreferrer" class="bevy-link"><strong>Bevy</strong></a> — data-oriented, cache-friendly, parallelizable. Fault injection, heat propagation, and replanning compose without coupling.
+                Built on <a href="https://bevyengine.org/" target="_blank" rel="noopener noreferrer" class="bevy-link"><strong>Bevy</strong></a>. Data-oriented, cache-friendly, parallelizable. Fault injection, heat propagation, and replanning compose without coupling.
               </p>
             </div>
           </div>
@@ -190,7 +190,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
                 <span class="pillar-line" style="background:#E8862A;"></span>Blazing Fast
               </h3>
               <p class="pillar-text">
-                Zero-cost abstractions. No garbage collector, no runtime overhead. Memory safety at compile time — 500-agent fault simulations without a single allocation in the hot loop.
+                Zero-cost abstractions. No garbage collector, no runtime overhead. Memory safety at compile time. 500-agent fault simulations without a single allocation in the hot loop.
               </p>
             </div>
           </div>
@@ -206,7 +206,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
                 <span class="pillar-line" style="background:#34D399;"></span>WebAssembly
               </h3>
               <p class="pillar-text">
-                Compiles to WASM, runs natively in the browser. No server, no install — open a URL and run 500-agent experiments at 60fps.
+                Compiles to WASM and runs in the browser. No server, no install. Open a URL and run 500-agent experiments at 60fps.
               </p>
             </div>
           </div>
@@ -231,7 +231,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
         </div>
 
         <p class="bevy-credit fade-in-up">
-          Powered by <a href="https://bevyengine.org/" target="_blank" rel="noopener noreferrer" class="bevy-credit-link">Bevy</a> — an open-source engine driven by an extraordinary community of contributors.
+          Powered by <a href="https://bevyengine.org/" target="_blank" rel="noopener noreferrer" class="bevy-credit-link">Bevy</a>, an open-source engine driven by its community of contributors.
         </p>
       </div>
     </section>
@@ -261,7 +261,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
             </div>
             <h4 class="eco-title">Algorithm Benchmarking</h4>
             <p class="eco-text">
-              We do not track algorithm baseline performances. For state-of-the-art algorithmic comparisons and the definitive leaderboard of solvers, we proudly refer researchers to the community-maintained <strong>MAPF Tracker</strong>.
+              For solver comparisons and leaderboards, see the <strong>MAPF Tracker</strong>.
             </p>
             <a href="https://tracker.pathfinding.ai/" target="_blank" rel="noopener noreferrer" class="eco-link">Visit MAPF Tracker ↗</a>
           </div>
@@ -287,7 +287,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
             </div>
             <h4 class="eco-title">Standard Instances</h4>
             <p class="eco-text">
-              We do not host rigid instance sets. For standardized 2D grid test environments (cities, games, mazes) and standard scenarios, please consult the <strong>MovingAI MAPF Benchmarks</strong> suite.
+              For standardized 2D grid test environments and scenarios, see the <strong>MovingAI MAPF Benchmarks</strong>.
             </p>
             <a href="https://movingai.com/benchmarks/mapf.html" target="_blank" rel="noopener noreferrer" class="eco-link">View MovingAI Benchmarks ↗</a>
           </div>
@@ -314,7 +314,7 @@ import CascadeScene from '../components/CascadeScene.jsx';
             </div>
             <h4 class="eco-title">Real-World Testbed</h4>
             <p class="eco-text">
-              We specialize in abstract chaos mechanics. To bridge the gap between MAPF logic and real-world robotics scaling, we highly recommend the <strong>SMART MAPF</strong> scalable realistic testbed.
+              For bridging the gap between MAPF logic and real-world robotics, see the <strong>SMART MAPF</strong> testbed.
             </p>
             <a href="https://smart-mapf.github.io/demo/" target="_blank" rel="noopener noreferrer" class="eco-link">Explore SMART MAPF ↗</a>
           </div>
@@ -816,24 +816,6 @@ import CascadeScene from '../components/CascadeScene.jsx';
       width: 100%;
       min-height: 350px;
     }
-    .cascade-metrics {
-      display: flex;
-      gap: 32px;
-      margin-top: 16px;
-    }
-    .cascade-metric {
-      font-family: var(--mono);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text);
-      opacity: 0.6;
-    }
-    .cascade-metric-value {
-      color: var(--red);
-      opacity: 1;
-    }
-
     /* ─── Section 6: Dark Section (Engine) ────────────────── */
     .dark-section {
       position: relative; z-index: 20; background: #080808;
@@ -1118,13 +1100,12 @@ import CascadeScene from '../components/CascadeScene.jsx';
       .pillar-icon { height: 48px; width: 48px; padding: 4px; border-radius: 12px; flex-shrink: 0; }
       .pillar-content { flex: 1; min-width: 0; }
 
-      .header-nav { gap: 16px; }
       .back-to-top { bottom: 24px; right: 24px; }
 
       /* Cascade: stack vertically */
       .cascade-layout { grid-template-columns: 1fr; gap: 32px; }
 
-      /* Gap section — at least one screen */
+      /* Gap section */
       .gap-section { padding: 80px 24px; min-height: 100dvh; }
       .gap-text { margin-bottom: 24px; }
 

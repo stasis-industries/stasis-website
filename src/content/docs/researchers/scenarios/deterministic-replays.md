@@ -43,7 +43,7 @@ struct TickHistory {
 }
 ```
 
-> [!NOTE] Recording starts from tick 1 of the live simulation. The headless baseline is not recorded — it runs instantly and is stored separately as reference data.
+> [!NOTE] Recording starts from tick 1 of the live simulation. The headless baseline is not recorded. It runs instantly and is stored separately as reference data.
 
 ## Memory Budget
 
@@ -55,7 +55,7 @@ struct TickHistory {
 | FaultEvents (rare) | ~50 B | 0.25 MB |
 | **Total** | **~21 KB** | **~105 MB** |
 
-105MB for 5000 fault-phase ticks is acceptable for a research desktop. The buffer is unbounded — it grows until the simulation ends or is stopped.
+105MB for 5000 fault-phase ticks is acceptable for a research desktop. The buffer is unbounded, growing until the simulation ends or is stopped.
 
 ## SimState Machine
 
@@ -68,7 +68,7 @@ Start ──▶ Running ──── Pause ──▶ Paused ──── Seek �
 - **Paused:** simulation frozen, camera still interactive, manual fault injection available
 - **Replay:** reading from snapshot buffer, all simulation systems inactive, 3D scene reconstructed from snapshot
 
-> [!IMPORTANT] Resume from Replay returns to Running and continues from where the simulation was paused (not from the replayed tick). Rewind is read-only — there is no branching from a past tick.
+> [!IMPORTANT] Resume from Replay returns to Running and continues from where the simulation was paused (not from the replayed tick). Rewind is read-only. There is no branching from a past tick.
 
 ## Chart Click-to-Seek
 
@@ -110,7 +110,7 @@ The throughput and fault survival charts show vertical red markers at each fault
 ## Step Behavior
 
 - **Step forward (Paused):** Run exactly 1 full tick of the pipeline (Tick → Fault → Analysis). Return to Paused. A new snapshot is recorded.
-- **Step backward (Paused or Replay):** Load previous tick's snapshot. Transition to Replay. Read-only — no new ticks are simulated.
+- **Step backward (Paused or Replay):** Load previous tick's snapshot. Transition to Replay. Read-only, no new ticks are simulated.
 
 ## Manual Fault Injection While Paused
 
@@ -120,7 +120,7 @@ Manual faults are tagged `FaultSource::Manual` but go through the same cascade p
 
 ## Code Location
 
-- `src/analysis/history.rs` — `TickSnapshot`, `TickHistory`, `record_tick_snapshot`
-- `src/core/state.rs` — `SimState` (Running, Paused, Replay, Finished)
-- `src/render/animator.rs` — replay rendering from snapshot
-- `src/ui/bridge.rs` — `seek_to_tick`, `step_backward`, `step_forward` commands
+- `src/analysis/history.rs` : `TickSnapshot`, `TickHistory`, `record_tick_snapshot`
+- `src/core/state.rs` : `SimState` (Running, Paused, Replay, Finished)
+- `src/render/animator.rs` : replay rendering from snapshot
+- `src/ui/bridge.rs` : `seek_to_tick`, `step_backward`, `step_forward` commands

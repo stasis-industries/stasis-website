@@ -396,7 +396,7 @@ function Simulation({ stasisCell, hoveredCell }) {
                 />
             )}
 
-            {/* Wave ring cells — individual meshes, NOT instancedMesh */}
+            {/* Wave ring cells (individual meshes, not instancedMesh) */}
             {waveCellList.map((cell) => (
                 <WaveCell key={cell.key} x={cell.x} z={cell.z} birthTime={cell.birthTime} clock={clockRef} />
             ))}
