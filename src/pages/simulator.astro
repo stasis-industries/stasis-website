@@ -7,7 +7,7 @@ import Layout from '../layouts/Layout.astro';
   description="Run lifelong multi-agent pathfinding simulations in 3D, inject faults, and measure how warehouse robotics systems degrade and recover. Built in Rust, running in your browser."
 >
 
-  <!-- Unavailable state (shown until JS confirms /simulator/index.html exists) -->
+  <!-- Unavailable state (shown until JS confirms /sim/index.html exists) -->
   <div id="sim-unavailable">
     <div class="sim-content">
 
@@ -36,7 +36,7 @@ import Layout from '../layouts/Layout.astro';
         <div class="spec-divider"></div>
         <div class="spec-item"><span class="spec-val">500</span><span class="spec-label">Max agents</span></div>
         <div class="spec-divider"></div>
-        <div class="spec-item"><span class="spec-val">2,700</span><span class="spec-label">Experiment runs</span></div>
+        <div class="spec-item"><span class="spec-val">2,520</span><span class="spec-label">Experiment runs</span></div>
       </div>
 
     </div>
@@ -45,7 +45,7 @@ import Layout from '../layouts/Layout.astro';
   <!-- Live simulator (hidden until JS confirms the file exists) -->
   <iframe
     id="sim-frame"
-    src="/simulator/index.html"
+    src="/sim/index.html"
     title="MAFIS Fault Resilience Observatory"
     allow="fullscreen"
   ></iframe>
@@ -53,7 +53,7 @@ import Layout from '../layouts/Layout.astro';
   <script>
     (async () => {
       try {
-        const res = await fetch('/simulator/index.html', { method: 'HEAD' });
+        const res = await fetch('/sim/index.html', { method: 'HEAD' });
         if (res.ok) {
           document.getElementById('sim-unavailable').style.display = 'none';
           document.getElementById('sim-frame').style.display = 'block';

@@ -46,8 +46,8 @@ jobs:
           else
             gh release download "$TAG" --repo stasis-industry/mafis --pattern "mafis-wasm.tar.gz" --dir /tmp
           fi
-          mkdir -p public/simulator
-          tar -xzf /tmp/mafis-wasm.tar.gz -C public/simulator
+          mkdir -p public/sim
+          tar -xzf /tmp/mafis-wasm.tar.gz -C public/sim
 
       - name: Install dependencies
         run: npm ci

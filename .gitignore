@@ -21,4 +21,5 @@ pnpm-debug.log*
 .DS_Store
 
 # Downloaded WASM artifacts from simulator repo
-public/simulator/
+public/sim/
+.vercel
