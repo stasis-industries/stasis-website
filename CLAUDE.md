@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Website for **Stasis AI** and its product **MAFIS** (Multi-Agent Fault Injection Simulator) — a Rust/Bevy/WASM simulator for chaos engineering in MAPF (Multi-Agent Path Finding) networks. This repo is the marketing site and documentation hub, not the simulator itself.
+Website for **Stasis** and its product **MAFIS** (Multi-Agent Fault Injection Simulator) — a Rust/Bevy/WASM simulator for chaos engineering in MAPF (Multi-Agent Path Finding) networks. This repo is the marketing site and documentation hub, not the simulator itself.
 
 MAFIS is a **research project** (not a thesis) by a 5th-year CS student. It may be submitted for peer review and potential publication.
 
