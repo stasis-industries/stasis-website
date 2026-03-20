@@ -62,7 +62,7 @@ npx playwright test --headed           # Run with visible browser
 
 ## Companion Rust/WASM Project
 
-The actual simulator lives at `/Users/teddyadmin/Developments/Rust/Research-Project/mapf-fis-3d`. It is a **Bevy 0.18** app with both WASM (web) and native desktop targets.
+The actual simulator lives at `/Users/teddyadmin/Developments/Research-Project/mafis`. It is a **Bevy 0.18** app with both WASM (web) and native desktop targets.
 
 **Build pipeline** (run from the Rust project root):
 ```bash
@@ -70,7 +70,7 @@ cargo check                                                            # ~5s typ
 cargo test                                                             # ~7s logic tests
 cargo build --release --target wasm32-unknown-unknown                  # WASM compile (~2-3 min)
 wasm-bindgen --out-dir web --target web \
-  target/wasm32-unknown-unknown/release/mapf-fis-3d.wasm              # Generate JS bindings
+  target/wasm32-unknown-unknown/release/mafis.wasm                    # Generate JS bindings
 basic-http-server web                                                  # Serve on port 4000
 ```
 
