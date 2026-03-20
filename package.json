@@ -14,12 +14,7 @@
     "@astrojs/sitemap": "^3.7.0",
     "@react-three/fiber": "^9.5.0",
     "@tailwindcss/vite": "^4.2.1",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.183.1",
     "astro": "^5.6.1",
-    "framer-motion": "^12.34.3",
-    "maath": "^0.10.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "rehype-katex": "^7.0.1",
@@ -30,6 +25,9 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.183.1",
     "astro-pagefind": "^1.8.5"
   }
 }

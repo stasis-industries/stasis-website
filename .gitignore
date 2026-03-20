@@ -19,3 +19,6 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# Downloaded WASM artifacts from simulator repo
+public/simulator/
