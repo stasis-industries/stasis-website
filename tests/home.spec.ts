@@ -18,10 +18,10 @@ test.describe('MAFIS Homepage', () => {
     test('hero section should display main calls to action', async ({ page }) => {
         await page.goto('/');
 
-        const researchButton = page.getByRole('link', { name: /Explore the research/i });
+        const ctaButton = page.getByRole('link', { name: /See how it works/i });
         const simulatorButton = page.getByRole('link', { name: /Try Simulator/i });
 
-        await expect(researchButton).toBeVisible();
+        await expect(ctaButton).toBeVisible();
         await expect(simulatorButton).toBeVisible();
     });
 
@@ -33,12 +33,12 @@ test.describe('MAFIS Homepage', () => {
         await expect(page.getByText('WebAssembly', { exact: true })).toBeVisible();
     });
 
-    test('gap section blockquote should be present', async ({ page }) => {
+    test('gap section description should be present', async ({ page }) => {
         await page.goto('/');
 
-        const blockquote = page.locator('.gap-quote');
-        await expect(blockquote).toBeVisible();
-        await expect(blockquote).toContainText('when things go wrong');
+        const gapDesc = page.locator('.gap-desc');
+        await expect(gapDesc).toBeVisible();
+        await expect(gapDesc).toContainText('sustained faults');
     });
 
     test('thesis section should have canvases', async ({ page }) => {

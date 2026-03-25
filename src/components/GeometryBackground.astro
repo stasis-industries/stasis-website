@@ -1,0 +1,95 @@
+---
+---
+<div class="geometry-bg" aria-hidden="true">
+  <div class="geo-shape geo-1"></div>
+  <div class="geo-shape geo-2"></div>
+  <div class="geo-shape geo-3"></div>
+  <div class="geo-shape geo-4"></div>
+  <div class="geo-shape geo-5"></div>
+  <div class="geo-shape geo-6"></div>
+</div>
+
+<style>
+  .geometry-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    perspective: 800px;
+  }
+
+  .geo-shape {
+    position: absolute;
+    border: 1px solid;
+    opacity: 0.04;
+  }
+
+  .geo-1 {
+    width: 120px; height: 80px;
+    top: 15%; left: 5%;
+    border-color: #3DB8E8;
+    transform: translateZ(-50px);
+    animation: geo-drift-1 20s ease-in-out infinite;
+  }
+  .geo-2 {
+    width: 80px; height: 60px;
+    top: 40%; right: 8%;
+    border-color: #E8862A;
+    transform: translateZ(-120px);
+    animation: geo-drift-2 25s ease-in-out infinite;
+  }
+  .geo-3 {
+    width: 150px; height: 40px;
+    bottom: 20%; left: 3%;
+    border-color: #991B1B;
+    opacity: 0.03;
+    transform: translateZ(-200px);
+    animation: geo-drift-3 18s ease-in-out infinite;
+  }
+  .geo-4 {
+    width: 60px; height: 100px;
+    top: 10%; right: 12%;
+    border-color: #3DB8E8;
+    opacity: 0.05;
+    transform: translateZ(-30px);
+    animation: geo-drift-1 22s ease-in-out infinite reverse;
+  }
+  .geo-5 {
+    width: 100px; height: 50px;
+    bottom: 35%; right: 5%;
+    border-color: #34D399;
+    opacity: 0.03;
+    transform: translateZ(-150px);
+    animation: geo-drift-2 16s ease-in-out infinite;
+  }
+  .geo-6 {
+    width: 90px; height: 70px;
+    top: 60%; left: 8%;
+    border-color: #E8862A;
+    opacity: 0.04;
+    transform: translateZ(-80px);
+    animation: geo-drift-3 23s ease-in-out infinite reverse;
+  }
+
+  @keyframes geo-drift-1 {
+    0%, 100% { transform: translate3d(0, 0, -50px) rotate(0deg); }
+    50% { transform: translate3d(15px, -20px, -50px) rotate(3deg); }
+  }
+  @keyframes geo-drift-2 {
+    0%, 100% { transform: translate3d(0, 0, -120px) rotate(0deg); }
+    50% { transform: translate3d(-10px, 15px, -120px) rotate(-2deg); }
+  }
+  @keyframes geo-drift-3 {
+    0%, 100% { transform: translate3d(0, 0, -200px); }
+    50% { transform: translate3d(20px, 10px, -200px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .geo-shape { animation: none; }
+  }
+
+  @media (max-width: 768px) {
+    .geo-shape { display: none; }
+  }
+</style>

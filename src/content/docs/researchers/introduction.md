@@ -9,20 +9,21 @@ MAFIS is a research project built in Rust using the Bevy engine, compiled to bot
 
 ## The Research Question
 
-> *Does performance in ideal conditions predict resilience under faults?*
+> *What happens to a multi-agent fleet under sustained fault injection?*
 
-A system that performs "worse" in perfect conditions may be "better" under sustained fault injection. MAFIS produces the evidence to prove or disprove this for different combinations of scheduler strategy, topology, and fault intensity.
+Different solvers, fault types, and topologies produce different degradation and recovery patterns. MAFIS makes those differences observable and measurable.
 
 ## Research Variables
 
 | Variable | Options |
 |---|---|
-| **Scheduler strategy** | Random, Closest-first, Balanced, RoundTrip |
-| **Fault intensity** | Off / Low / Medium / High |
-| **Grid topology** | Warehouse Medium, Kiva Large, Sorting Center, Compact Grid |
 | **Solver** | PIBT, RHCR (3 variants), Token Passing |
+| **Fault type** | Burst, Wear-based, Zone outage, Intermittent |
+| **Grid topology** | Warehouse Medium, Kiva Large, Sorting Center, Compact Grid |
+| **Agent density** | Configurable (slider) |
+| **Scheduler strategy** | Random, Closest-first, Balanced, RoundTrip |
 
-The solver is typically held constant while the other variables are swept. The primary insight MAFIS is built to reveal: **scheduler strategy, not solver algorithm, determines fault resilience.**
+MAFIS is built to study how solver architecture, fault type, and topology interact under sustained fault conditions.
 
 ## Resilience Scorecard
 

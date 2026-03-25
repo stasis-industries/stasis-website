@@ -422,8 +422,8 @@ function InfiniteGrid({ themeState }) {
 
         // Check if dark mode is active on initial load
         const isDark = typeof window !== 'undefined' && document.documentElement.classList.contains('dark');
-        const centerCol = isDark ? new THREE.Color('#222222') : lightCenter;
-        const edgeCol = isDark ? new THREE.Color('#111111') : lightEdge;
+        const centerCol = isDark ? new THREE.Color('#BBBBBB') : lightCenter;
+        const edgeCol = isDark ? new THREE.Color('#0d0d0d') : lightEdge;
 
         for (let x = -SIZE; x <= SIZE; x++) {
             const d = Math.abs(x) / SIZE;

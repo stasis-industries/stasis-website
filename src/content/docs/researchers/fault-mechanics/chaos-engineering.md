@@ -1,18 +1,32 @@
 ---
 title: Fault Types
-description: The four fault types in MAFIS (Overheat, Breakdown, TemporaryBlockage, and Latency) and how FaultSource distinguishes automatic from manual injection.
+description: The five fault types in MAFIS organized in a 3-category taxonomy (Recoverable, Permanent-distributed, Permanent-localized) and how FaultSource distinguishes automatic from manual injection.
 ---
 
-MAFIS supports four fault types that model different real-world failure modes in multi-agent systems. All four go through the same cascade pipeline (ADG → BFS → replan), which makes their resilience metrics scientifically comparable regardless of how they were triggered.
+MAFIS supports five fault types organized in a **3-category taxonomy** based on duration and scope. All types go through the same cascade pipeline (ADG → BFS → replan), which makes their resilience metrics scientifically comparable regardless of how they were triggered.
 
-## Fault Type Taxonomy
+## 3-Category Taxonomy
 
-| Type | Agent State | Grid Effect | Duration | Recovery |
-|---|---|---|---|---|
-| **Overheat** | Dead | Cell becomes obstacle | Permanent | None |
-| **Breakdown** | Dead | Cell becomes obstacle | Permanent | None |
-| **TemporaryBlockage** | N/A (cell-based) | Cell becomes unwalkable | Configurable (N ticks) | Auto-removes after N ticks |
-| **Latency** | Alive, degraded | None | Configurable (N ticks) | Agent executes Wait for N ticks, then resumes normally |
+| Category | Types | Duration | Scope |
+|---|---|---|---|
+| **Recoverable** | TemporaryBlockage, Latency | Temporary (N ticks) | Cell or agent |
+| **Permanent-distributed** | Overheat, Breakdown | Permanent | Individual agents, randomly distributed |
+| **Permanent-localized** | PermanentZoneOutage | Permanent | Entire zone (contiguous area) |
+
+This taxonomy is the basis for the paper's experimental design. Each category produces a distinct resilience signature:
+- **Recoverable** faults test how quickly the system adapts and recovers.
+- **Permanent-distributed** faults model fleet attrition. Individual agents die and become permanent obstacles, randomly distributed across the grid.
+- **Permanent-localized** faults eliminate entire zones from the operational map, testing global replanning capacity.
+
+## Full Fault Type Reference
+
+| Type | Category | Agent State | Grid Effect | Duration | Recovery |
+|---|---|---|---|---|---|
+| **Overheat** | Permanent-distributed | Dead | Cell becomes obstacle | Permanent | None |
+| **Breakdown** | Permanent-distributed | Dead | Cell becomes obstacle | Permanent | None |
+| **TemporaryBlockage** | Recoverable | N/A (cell-based) | Cell becomes unwalkable | Configurable (N ticks) | Auto-removes after N ticks |
+| **Latency** | Recoverable | Alive, degraded | None | Configurable (N ticks) | Agent resumes after N ticks |
+| **PermanentZoneOutage** | Permanent-localized | Agents in zone die | Zone cells become obstacles | Permanent | None |
 
 ### Overheat
 
@@ -37,6 +51,20 @@ An agent-level degradation fault. The affected agent executes `Action::Wait` for
 Real-world analogy: a robot's sensor system lags, a communication packet is dropped, or a software hang causes the robot to freeze briefly before recovering.
 
 > [!NOTE] Latency faults are the mildest fault type. The agent is alive, occupies its cell, and recovers automatically. Use them to study congestion propagation without permanent fleet attrition.
+
+### PermanentZoneOutage
+
+A permanent, localized fault that blocks an entire zone at a configurable tick. The busiest zone is selected deterministically, and its walkable cells become permanent obstacles. Agents standing on blocked cells die immediately. All task assignments into the zone are invalidated.
+
+Parameters:
+- `at_tick`: when the blockage fires (e.g., tick 100)
+- `block_percent`: fraction of zone cells to block (1–100%; default 100%)
+
+Real-world analogy: a fire in a warehouse aisle permanently closes an entire section; a structural collapse blocks a storage zone; a water leak forces evacuation of a delivery area.
+
+> [!WARNING] PermanentZoneOutage is the most destructive fault type. A 100% blockage removes all zone cells from the operational map for the remainder of the run.
+
+This is the **Category 3 — Permanent-localized** fault in the paper's taxonomy. It was added to test a failure mode that prior work on *k*-robust MAPF and delay-based fault models does not cover.
 
 ## FaultSource
 

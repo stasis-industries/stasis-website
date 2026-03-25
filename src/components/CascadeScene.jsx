@@ -99,7 +99,7 @@ export default function CascadeScene() {
     let peakSpread = 0;
 
     function resize() {
-      const size = Math.min(container.clientWidth, GRID_SIZE * 36);
+      const size = Math.min(container.clientWidth, GRID_SIZE * 26);
       canvas.width = size * dpr;
       canvas.height = size * dpr;
       canvas.style.width = size + 'px';
@@ -297,58 +297,67 @@ export default function CascadeScene() {
     };
   }, [isPlaying]);
 
+  const maxGridPx = GRID_SIZE * 26;
   return (
-    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-      <canvas
-        ref={canvasRef}
-        style={{
-          display: 'block', maxWidth: '100%', borderRadius: 4,
-        }}
-      />
+    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+      <div style={{
+        background: 'var(--thesis-grid-bg, #E2DED8)',
+        border: '1px solid var(--thesis-grid-border, rgba(0,0,0,0.08))',
+        borderRadius: 8,
+        overflow: 'hidden',
+        width: '100%',
+        maxWidth: maxGridPx,
+      }}>
+        <canvas
+          ref={canvasRef}
+          style={{ display: 'block', width: '100%' }}
+        />
+      </div>
       <div style={{
         display: 'flex',
-        gap: 48,
-        flexWrap: 'wrap',
+        gap: 12,
         justifyContent: 'center',
+        width: '100%',
+        maxWidth: maxGridPx,
       }}>
         <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-          padding: '12px 20px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+          padding: '8px 14px',
           border: '1px solid var(--border)',
           borderRadius: 8,
-          minWidth: 140,
+          flex: 1,
         }}>
           <span style={{
-            fontFamily: '"DM Mono", monospace', fontSize: 9, textTransform: 'uppercase',
-            letterSpacing: '0.15em', color: 'var(--text)', opacity: 0.4,
+            fontFamily: '"DM Mono", monospace', fontSize: 8, textTransform: 'uppercase',
+            letterSpacing: '0.12em', color: 'var(--text)', opacity: 0.4,
           }}>CASCADE DEPTH</span>
           <span style={{
-            fontFamily: 'var(--serif)', fontSize: 28, fontWeight: 400,
+            fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 400,
             color: 'var(--red)', fontVariantNumeric: 'tabular-nums', lineHeight: 1,
           }}>{cascadeDepth}</span>
           <span style={{
-            fontFamily: '"DM Mono", monospace', fontSize: 9, textTransform: 'uppercase',
-            letterSpacing: '0.1em', color: 'var(--text)', opacity: 0.3,
+            fontFamily: '"DM Mono", monospace', fontSize: 8, textTransform: 'uppercase',
+            letterSpacing: '0.08em', color: 'var(--text)', opacity: 0.3,
           }}>levels</span>
         </div>
         <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-          padding: '12px 20px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+          padding: '8px 14px',
           border: '1px solid var(--border)',
           borderRadius: 8,
-          minWidth: 140,
+          flex: 1,
         }}>
           <span style={{
-            fontFamily: '"DM Mono", monospace', fontSize: 9, textTransform: 'uppercase',
-            letterSpacing: '0.15em', color: 'var(--text)', opacity: 0.4,
+            fontFamily: '"DM Mono", monospace', fontSize: 8, textTransform: 'uppercase',
+            letterSpacing: '0.12em', color: 'var(--text)', opacity: 0.4,
           }}>CASCADE SPREAD</span>
           <span style={{
-            fontFamily: 'var(--serif)', fontSize: 28, fontWeight: 400,
+            fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 400,
             color: '#E8862A', fontVariantNumeric: 'tabular-nums', lineHeight: 1,
           }}>{cascadeSpread}</span>
           <span style={{
-            fontFamily: '"DM Mono", monospace', fontSize: 9, textTransform: 'uppercase',
-            letterSpacing: '0.1em', color: 'var(--text)', opacity: 0.3,
+            fontFamily: '"DM Mono", monospace', fontSize: 8, textTransform: 'uppercase',
+            letterSpacing: '0.08em', color: 'var(--text)', opacity: 0.3,
           }}>agents</span>
         </div>
       </div>

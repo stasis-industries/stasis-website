@@ -1,40 +1,34 @@
 import { useRef, useEffect, useState } from 'react';
 
-// ─── Constants ──────────────────────────────────────────────────────
 const TIMELINE_H = 250;
-const WARMUP_RATIO = 0.4;
-const ANIM_DURATION = 5000; // 5s loop
+const FAULT_POINT = 40;
+const TOTAL_POINTS = 100;
+const ANIM_DURATION = 5000;
 const PAUSE_DURATION = 1500;
 
-const PHASE_COLORS = {
-  warmupFill: 'rgba(10,10,10,0.04)',
-  warmupFillDark: 'rgba(240,237,233,0.04)',
-  curve: '#047857',
-  baseline: 'rgba(10,10,10,0.15)',
-  baselineDark: 'rgba(240,237,233,0.15)',
-  faultMarker: '#991B1B',
-  label: 'rgba(10,10,10,0.4)',
-  labelDark: 'rgba(240,237,233,0.4)',
-};
+function baselineNoise(i) {
+  return Math.sin(i * 0.3) * 0.015 + Math.cos(i * 0.7) * 0.01 + Math.sin(i * 1.1) * 0.008;
+}
 
-// ─── Throughput Curve Data ──────────────────────────────────────────
-function generateCurve(steps) {
+function generateBaseline() {
   const points = [];
-  const warmupEnd = Math.floor(steps * WARMUP_RATIO);
-  const DIP_DELAY = 3; // dip starts 3 steps after fault line
-  for (let i = 0; i < steps; i++) {
-    if (i < warmupEnd + DIP_DELAY) {
-      // Subtle natural variation during warmup, flat after fault
-      const noise = i < warmupEnd
-        ? Math.sin(i * 0.4) * 0.008 + Math.cos(i * 0.7) * 0.005
-        : 0;
-      points.push(0.82 + noise);
+  for (let i = 0; i < TOTAL_POINTS; i++) {
+    points.push(0.80 + baselineNoise(i));
+  }
+  return points;
+}
+
+function generateFaultInjection(baseline) {
+  const points = [];
+  for (let i = 0; i < TOTAL_POINTS; i++) {
+    if (i <= FAULT_POINT) {
+      points.push(baseline[i]);
     } else {
-      const elapsed = (i - (warmupEnd + DIP_DELAY)) / (steps - (warmupEnd + DIP_DELAY));
-      // Dip then partial recovery
-      const dip = Math.exp(-elapsed * 3) * 0.35;
-      const recovery = 0.65 + elapsed * 0.12;
-      points.push(Math.min(0.82, recovery - dip + Math.sin(i * 0.2) * 0.02));
+      const elapsed = (i - FAULT_POINT) / (TOTAL_POINTS - FAULT_POINT);
+      const dip = Math.exp(-elapsed * 2.5) * 0.30;
+      const recovery = 0.72;
+      const noise = Math.sin(i * 0.4) * 0.012 + Math.cos(i * 0.9) * 0.008;
+      points.push(Math.min(baseline[i], recovery - dip + noise));
     }
   }
   return points;
@@ -47,23 +41,19 @@ export default function ObservatoryTimeline() {
   const isDarkRef = useRef(false);
 
   useEffect(() => {
-    // Theme detection
     isDarkRef.current = document.documentElement.classList.contains('dark');
     const mutObs = new MutationObserver(() => {
       isDarkRef.current = document.documentElement.classList.contains('dark');
     });
-    mutObs.observe(document.documentElement, { attributes: true });
+    mutObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     return () => mutObs.disconnect();
   }, []);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => setIsPlaying(entry.isIntersecting));
-      },
+      (entries) => entries.forEach((entry) => setIsPlaying(entry.isIntersecting)),
       { threshold: 0.4 }
     );
     observer.observe(el);
@@ -81,7 +71,8 @@ export default function ObservatoryTimeline() {
 
     let width = container.clientWidth;
     const height = TIMELINE_H;
-    const curveData = generateCurve(100);
+    const baselineData = generateBaseline();
+    const faultData = generateFaultInjection(baselineData);
 
     function resize() {
       width = container.clientWidth;
@@ -98,140 +89,109 @@ export default function ObservatoryTimeline() {
     let frameId = null;
     let running = true;
 
-    const pad = { top: 40, bottom: 30, left: 0, right: 0 };
+    const pad = { top: 40, bottom: 30, left: 20, right: 0 };
     const plotW = () => width - pad.left - pad.right;
     const plotH = height - pad.top - pad.bottom;
 
+    function xForIndex(i, pw) {
+      return pad.left + (i / (TOTAL_POINTS - 1)) * pw;
+    }
+    function yForValue(v) {
+      return pad.top + plotH - v * plotH;
+    }
+
+    function drawCurve(data, pointCount, pw, style) {
+      if (pointCount < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = style.color;
+      ctx.lineWidth = style.lineWidth;
+      ctx.lineJoin = 'round';
+      if (style.dash) ctx.setLineDash(style.dash);
+      else ctx.setLineDash([]);
+      for (let i = 0; i < pointCount; i++) {
+        const x = xForIndex(i, pw);
+        const y = yForValue(data[i]);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
     function draw(time) {
       if (!running) return;
-
-      if (!isPlaying) {
-        animStart = null;
-        return;
-      }
-
+      if (!isPlaying) { animStart = null; frameId = requestAnimationFrame(draw); return; }
       if (!animStart) animStart = time;
-      let elapsed = time - animStart;
-      const totalCycle = ANIM_DURATION + PAUSE_DURATION;
-      elapsed = elapsed % totalCycle;
-      const progress = Math.min(elapsed / ANIM_DURATION, 1);
 
+      let elapsed = (time - animStart) % (ANIM_DURATION + PAUSE_DURATION);
+      const progress = Math.min(elapsed / ANIM_DURATION, 1);
       const dark = isDarkRef.current;
       const pw = plotW();
+      const labelColor = dark ? 'rgba(240,237,233,0.4)' : 'rgba(10,10,10,0.4)';
+      const baselineColor = dark ? 'rgba(240,237,233,0.35)' : 'rgba(10,10,10,0.35)';
 
       ctx.clearRect(0, 0, width, height);
+      const faultX = xForIndex(FAULT_POINT, pw);
+      const pointCount = Math.floor(TOTAL_POINTS * progress);
 
-      // ─── Phase bars ───
-      const warmupW = pw * WARMUP_RATIO;
-      const warmupProgress = Math.min(progress / 0.3, 1); // fill in first 30% of animation
-
-      // Warmup bar
-      ctx.fillStyle = dark ? PHASE_COLORS.warmupFillDark : PHASE_COLORS.warmupFill;
-      ctx.fillRect(pad.left, pad.top, warmupW * warmupProgress, plotH);
-
-      // Fault injection bar (appears after warmup fills)
-      if (progress > 0.3) {
-        const faultProgress = Math.min((progress - 0.3) / 0.2, 1);
+      // Red tint after fault
+      if (pointCount > FAULT_POINT) {
+        const drawnEndX = xForIndex(Math.min(pointCount - 1, TOTAL_POINTS - 1), pw);
         ctx.fillStyle = dark ? 'rgba(153,27,27,0.06)' : 'rgba(153,27,27,0.04)';
-        ctx.fillRect(pad.left + warmupW, pad.top, (pw - warmupW) * faultProgress, plotH);
+        ctx.fillRect(faultX, pad.top, drawnEndX - faultX, plotH);
+      }
+
+      // Fault marker line
+      if (pointCount > FAULT_POINT) {
+        ctx.strokeStyle = '#991B1B';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.moveTo(faultX, pad.top - 5);
+        ctx.lineTo(faultX, pad.top + plotH + 5);
+        ctx.stroke();
+
+        ctx.font = '9px "DM Mono", monospace';
+        ctx.fillStyle = '#991B1B';
+        ctx.textAlign = 'left';
+        ctx.fillText('FAULT INJECTED', faultX + 8, pad.top - 8);
       }
 
       // Phase labels
-      const labelColor = dark ? PHASE_COLORS.labelDark : PHASE_COLORS.label;
       ctx.font = '9px "DM Mono", monospace';
       ctx.textAlign = 'center';
-
-      if (warmupProgress > 0.5) {
-        ctx.fillStyle = labelColor;
-        ctx.globalAlpha = Math.min(1, (warmupProgress - 0.5) * 4);
-        ctx.fillText('WARMUP', pad.left + warmupW / 2, pad.top + 16);
-        ctx.globalAlpha = 1;
+      ctx.fillStyle = labelColor;
+      if (pointCount > 10 && pointCount <= FAULT_POINT) {
+        ctx.fillText('IDENTICAL', pad.left + (faultX - pad.left) / 2, pad.top + 16);
+      } else if (pointCount > FAULT_POINT) {
+        ctx.fillText('IDENTICAL', pad.left + (faultX - pad.left) / 2, pad.top + 16);
+        ctx.fillText('DIVERGENCE', faultX + (pad.left + pw - faultX) / 2, pad.top + 16);
       }
 
-      // "FAULTS ACTIVE" marker
-      if (progress > 0.35) {
-        const markerX = pad.left + warmupW;
-        const opacity = Math.min(1, (progress - 0.35) * 6);
+      // Draw both curves
+      drawCurve(baselineData, pointCount, pw, { color: baselineColor, lineWidth: 1.5, dash: [5, 5] });
+      drawCurve(faultData, pointCount, pw, { color: '#047857', lineWidth: 2, dash: null });
 
-        // Vertical red line
-        ctx.strokeStyle = PHASE_COLORS.faultMarker;
-        ctx.globalAlpha = opacity;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(markerX, pad.top - 5);
-        ctx.lineTo(markerX, pad.top + plotH + 5);
-        ctx.stroke();
-
-        // Label
-        ctx.fillStyle = PHASE_COLORS.faultMarker;
+      // Endpoint labels
+      if (pointCount > TOTAL_POINTS * 0.7) {
+        const lastIdx = Math.min(pointCount - 1, TOTAL_POINTS - 1);
+        const labelX = xForIndex(lastIdx, pw);
+        ctx.font = '9px "DM Mono", monospace';
         ctx.textAlign = 'left';
-        ctx.fillText('FAULTS ACTIVE', markerX + 8, pad.top - 8);
-        ctx.globalAlpha = 1;
+        ctx.fillStyle = baselineColor;
+        ctx.fillText('BASELINE', labelX + 6, yForValue(baselineData[lastIdx]));
+        ctx.fillStyle = '#047857';
+        ctx.fillText('FAULT INJECTION', labelX + 6, yForValue(faultData[lastIdx]) + 2);
+      }
 
-        // Fault injection label
+      // Y-axis label
+      if (progress > 0.2) {
         ctx.fillStyle = labelColor;
-        ctx.textAlign = 'center';
-        const faultLabelOpacity = Math.min(1, (progress - 0.4) * 4);
-        ctx.globalAlpha = faultLabelOpacity;
-        ctx.fillText('FAULT INJECTION', pad.left + warmupW + (pw - warmupW) / 2, pad.top + 16);
-        ctx.globalAlpha = 1;
-      }
-
-      // ─── Throughput curve ───
-      if (progress > 0.15) {
-        const curveProgress = Math.min((progress - 0.15) / 0.65, 1);
-        const pointCount = Math.floor(curveData.length * curveProgress);
-
-        if (pointCount > 1) {
-          ctx.beginPath();
-          ctx.strokeStyle = PHASE_COLORS.curve;
-          ctx.lineWidth = 2;
-          ctx.lineJoin = 'round';
-
-          for (let i = 0; i < pointCount; i++) {
-            const x = pad.left + (i / (curveData.length - 1)) * pw;
-            const y = pad.top + plotH - curveData[i] * plotH;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-        }
-      }
-
-      // ─── Dashed baseline ───
-      if (progress > 0.6) {
-        const baselineY = pad.top + plotH - 0.82 * plotH;
-        const baselineProgress = Math.min((progress - 0.6) / 0.2, 1);
-        const baselineW = pw * baselineProgress;
-
-        ctx.strokeStyle = dark ? PHASE_COLORS.baselineDark : PHASE_COLORS.baseline;
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(pad.left, baselineY);
-        ctx.lineTo(pad.left + baselineW, baselineY);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Baseline label
-        if (baselineProgress > 0.5) {
-          ctx.fillStyle = labelColor;
-          ctx.globalAlpha = Math.min(1, (baselineProgress - 0.5) * 4);
-          ctx.textAlign = 'right';
-          ctx.fillText('BASELINE', pad.left + pw - 4, baselineY - 6);
-          ctx.globalAlpha = 1;
-        }
-      }
-
-      // ─── Throughput label ───
-      if (progress > 0.3) {
-        ctx.fillStyle = labelColor;
-        ctx.textAlign = 'left';
         ctx.globalAlpha = 0.6;
         ctx.save();
-        ctx.translate(pad.left - 2, pad.top + plotH / 2);
+        ctx.translate(pad.left - 6, pad.top + plotH / 2);
         ctx.rotate(-Math.PI / 2);
         ctx.textAlign = 'center';
+        ctx.font = '9px "DM Mono", monospace';
         ctx.fillText('THROUGHPUT', 0, -4);
         ctx.restore();
         ctx.globalAlpha = 1;
@@ -241,12 +201,7 @@ export default function ObservatoryTimeline() {
     }
 
     frameId = requestAnimationFrame(draw);
-
-    return () => {
-      running = false;
-      window.removeEventListener('resize', resize);
-      if (frameId) cancelAnimationFrame(frameId);
-    };
+    return () => { running = false; window.removeEventListener('resize', resize); if (frameId) cancelAnimationFrame(frameId); };
   }, [isPlaying]);
 
   return (

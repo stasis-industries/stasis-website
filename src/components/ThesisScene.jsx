@@ -10,7 +10,7 @@ const TOTAL_TICKS = 40;
 const FAULT_TICK = 16;
 const LABEL_TICK = 35;
 
-const COLORS = {
+const COLORS_DARK = {
   normal: '#3DB8E8',
   dead: '#991B1B',
   rerouting: '#E8862A',
@@ -18,6 +18,19 @@ const COLORS = {
   gridLine: 'rgba(240,237,233,0.08)',
   sparklineGreen: '#047857',
   sparklineRed: '#991B1B',
+  crossStroke: '#F0EDE9',
+  canvasBg: '#0a0a0a',
+};
+const COLORS_LIGHT = {
+  normal: '#3DB8E8',
+  dead: '#991B1B',
+  rerouting: '#E8862A',
+  deadlocked: '#ff4d4d',
+  gridLine: 'rgba(10,10,10,0.08)',
+  sparklineGreen: '#047857',
+  sparklineRed: '#991B1B',
+  crossStroke: '#1a1a1a',
+  canvasBg: '#ddd8d2',
 };
 
 // Fault agent index in each layout (the agent starting at (5,5))
@@ -103,6 +116,16 @@ function SingleGrid({ label, variant, isPlaying }) {
   const sparklineData = useRef(generateSparkline(variant));
   const [resultLabel, setResultLabel] = useState(null);
   const sizeRef = useRef({ gridPx: MAX_GRID_PX, cellPx: BASE_CELL_PX, agentR: BASE_AGENT_RADIUS });
+  const isDarkRef = useRef(true);
+
+  useEffect(() => {
+    isDarkRef.current = document.documentElement.classList.contains('dark');
+    const obs = new MutationObserver(() => {
+      isDarkRef.current = document.documentElement.classList.contains('dark');
+    });
+    obs.observe(document.documentElement, { attributes: true });
+    return () => obs.disconnect();
+  }, []);
 
   const faultAgentIdx = FAULT_AGENT[variant];
 
@@ -203,10 +226,12 @@ function SingleGrid({ label, variant, isPlaying }) {
 
     function drawGrid() {
       const { gridPx, cellPx, agentR } = sizeRef.current;
-      ctx.clearRect(0, 0, gridPx, gridPx);
+      const C = isDarkRef.current ? COLORS_DARK : COLORS_LIGHT;
 
-      // Grid lines
-      ctx.strokeStyle = COLORS.gridLine;
+      ctx.fillStyle = C.canvasBg;
+      ctx.fillRect(0, 0, gridPx, gridPx);
+
+      ctx.strokeStyle = C.gridLine;
       ctx.lineWidth = 1;
       for (let i = 0; i <= GRID_SIZE; i++) {
         ctx.beginPath(); ctx.moveTo(i * cellPx, 0); ctx.lineTo(i * cellPx, gridPx); ctx.stroke();
@@ -223,10 +248,10 @@ function SingleGrid({ label, variant, isPlaying }) {
         const px = vx * cellPx + cellPx / 2;
         const py = vy * cellPx + cellPx / 2;
 
-        let color = COLORS.normal;
-        if (a.state === 'dead') color = COLORS.dead;
-        else if (a.state === 'rerouting') color = COLORS.rerouting;
-        else if (a.state === 'deadlocked') color = COLORS.deadlocked;
+        let color = C.normal;
+        if (a.state === 'dead') color = C.dead;
+        else if (a.state === 'rerouting') color = C.rerouting;
+        else if (a.state === 'deadlocked') color = C.deadlocked;
 
         ctx.beginPath();
         ctx.arc(px, py, agentR, 0, Math.PI * 2);
@@ -234,7 +259,7 @@ function SingleGrid({ label, variant, isPlaying }) {
         ctx.fill();
 
         if (a.state === 'dead') {
-          ctx.strokeStyle = '#F0EDE9';
+          ctx.strokeStyle = C.crossStroke;
           ctx.lineWidth = 2;
           const s = agentR * 0.5;
           ctx.beginPath();
@@ -252,6 +277,7 @@ function SingleGrid({ label, variant, isPlaying }) {
       const sparkH = sparkCanvas.height / (window.devicePixelRatio || 1);
       const tick = tickRef.current;
       const data = sparklineData.current;
+      const C = isDarkRef.current ? COLORS_DARK : COLORS_LIGHT;
 
       sparkCtx.clearRect(0, 0, gridPx, sparkH);
       if (tick < 2) return;
@@ -260,7 +286,7 @@ function SingleGrid({ label, variant, isPlaying }) {
       const stepX = gridPx / TOTAL_TICKS;
 
       sparkCtx.beginPath();
-      sparkCtx.strokeStyle = variant === 'resilient' ? COLORS.sparklineGreen : COLORS.sparklineRed;
+      sparkCtx.strokeStyle = variant === 'resilient' ? C.sparklineGreen : C.sparklineRed;
       sparkCtx.lineWidth = 1.5;
 
       for (let i = 0; i < pointCount; i++) {
@@ -314,12 +340,20 @@ function SingleGrid({ label, variant, isPlaying }) {
         fontSize: 10,
         textTransform: 'uppercase',
         letterSpacing: '0.15em',
-        color: '#F0EDE9',
+        color: 'var(--text, #F0EDE9)',
         opacity: 0.5,
       }}>{label}</span>
 
-      <canvas ref={canvasRef} style={{ borderRadius: 4, display: 'block' }} />
-      <canvas ref={sparkRef} style={{ display: 'block' }} />
+      <div style={{
+        background: 'var(--thesis-grid-bg, #E2DED8)',
+        border: '1px solid var(--thesis-grid-border, rgba(0,0,0,0.08))',
+        borderRadius: 8,
+        overflow: 'hidden',
+        width: '100%',
+      }}>
+        <canvas ref={canvasRef} style={{ display: 'block', width: '100%' }} />
+      </div>
+      <canvas ref={sparkRef} style={{ display: 'block', width: '100%', marginTop: 6 }} />
 
       <span style={{
         fontFamily: '"DM Mono", monospace',
@@ -374,8 +408,8 @@ export default function ThesisScene() {
         justifyContent: 'center',
         flexWrap: 'wrap',
       }}>
-        <SingleGrid label="DISTRIBUTED LOAD" variant="resilient" isPlaying={isPlaying} />
-        <SingleGrid label="CONCENTRATED LOAD" variant="fragile" isPlaying={isPlaying} />
+        <SingleGrid label="SPARSE AGENTS" variant="resilient" isPlaying={isPlaying} />
+        <SingleGrid label="DENSE AGENTS" variant="fragile" isPlaying={isPlaying} />
       </div>
     </div>
   );
