@@ -395,13 +395,11 @@ export default function InstrumentPanel() {
             display: none !important;
           }
           .instrument-card {
-            position: relative !important;
-            top: auto !important;
-            z-index: auto !important;
-            margin-bottom: 16px !important;
+            height: auto !important;
+            top: 80px !important;
           }
           .card-spacer {
-            display: none !important;
+            height: 100px !important;
           }
         }
         @media (max-width: 600px) {
@@ -409,6 +407,7 @@ export default function InstrumentPanel() {
             grid-template-columns: 1fr;
           }
           .card-visual-col {
+            min-height: 200px;
             border-right: none !important;
             border-bottom: 1px solid ${borderColor};
           }

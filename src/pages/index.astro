@@ -5,7 +5,6 @@ import KineticGrid from '../components/KineticGrid.jsx';
 import ThesisScene from '../components/ThesisScene.jsx';
 import ObservatoryTimeline from '../components/ObservatoryTimeline.jsx';
 import CascadeScene from '../components/CascadeScene.jsx';
-import GridBackground from '../components/GridBackground.jsx';
 import InstrumentPanel from '../components/InstrumentPanel.jsx';
 import GeometryBackground from '../components/GeometryBackground.astro';
 ---
@@ -50,9 +49,8 @@ import GeometryBackground from '../components/GeometryBackground.astro';
     </section>
 
     <!-- ══════════ SECTION 2: THE GAP ══════════ -->
-    <section class="gap-section" id="the-gap" style="position: relative;">
-      <GridBackground client:only="react" />
-      <div class="gap-inner fade-in-up" style="position: relative; z-index: 1;">
+    <section class="gap-section" id="the-gap">
+      <div class="gap-inner fade-in-up">
         <div class="gap-text-col">
           <span class="section-label">THE GAP</span>
           <h2 class="gap-title">Most MAPF tools measure speed. What about <em>resilience?</em></h2>
@@ -1045,8 +1043,9 @@ import GeometryBackground from '../components/GeometryBackground.astro';
       .scorecard-metric-value { font-size: 14px; }
 
       /* Cascade mobile */
-      .cascade-section { padding: 60px 0; }
-      .cascade-section .section-inner { padding: 32px 16px; }
+      .cascade-section { padding: 60px 0; min-height: 100dvh; display: flex; align-items: center; }
+      .cascade-section .section-inner { padding: 32px 24px; width: 100%; }
+      .cascade-text { text-align: center; }
       .cascade-title { font-size: 1.6rem; margin-bottom: 16px; }
       .cascade-desc { font-size: 0.9rem; line-height: 1.7; margin-bottom: 8px; }
       .cascade-scene-wrapper { overflow: hidden; }
