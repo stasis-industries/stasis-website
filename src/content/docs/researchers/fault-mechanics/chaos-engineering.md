@@ -13,7 +13,7 @@ MAFIS supports five fault types organized in a **3-category taxonomy** based on 
 | **Permanent-distributed** | Overheat, Breakdown | Permanent | Individual agents, randomly distributed |
 | **Permanent-localized** | PermanentZoneOutage | Permanent | Entire zone (contiguous area) |
 
-This taxonomy is the basis for the paper's experimental design. Each category produces a distinct resilience signature:
+Each category produces a distinct resilience signature:
 - **Recoverable** faults test how quickly the system adapts and recovers.
 - **Permanent-distributed** faults model fleet attrition. Individual agents die and become permanent obstacles, randomly distributed across the grid.
 - **Permanent-localized** faults eliminate entire zones from the operational map, testing global replanning capacity.
@@ -46,7 +46,7 @@ Agents whose paths cross the blocked cell must replan around it. When the blocka
 
 ### Latency
 
-An agent-level degradation fault. The affected agent executes `Action::Wait` for N consecutive ticks regardless of what PIBT would assign. After N ticks, the agent resumes normal operation. The agent is **alive and occupying a cell** during latency. It is not an obstacle, but it is unresponsive to the planner.
+An agent-level degradation fault. The affected agent executes `Action::Wait` for N consecutive ticks regardless of what the solver would assign. After N ticks, the agent resumes normal operation. The agent is **alive and occupying a cell** during latency. It is not an obstacle, but it is unresponsive to the planner.
 
 Real-world analogy: a robot's sensor system lags, a communication packet is dropped, or a software hang causes the robot to freeze briefly before recovering.
 
@@ -64,7 +64,7 @@ Real-world analogy: a fire in a warehouse aisle permanently closes an entire sec
 
 > [!WARNING] PermanentZoneOutage is the most destructive fault type. A 100% blockage removes all zone cells from the operational map for the remainder of the run.
 
-This is the **Category 3 — Permanent-localized** fault in the paper's taxonomy. It was added to test a failure mode that prior work on *k*-robust MAPF and delay-based fault models does not cover.
+This fault type tests a failure mode that prior work on *k*-robust MAPF and delay-based fault models does not cover.
 
 ## FaultSource
 
@@ -74,6 +74,7 @@ All faults carry a `FaultSource` tag:
 pub enum FaultSource {
     Automatic,  // System-generated via heat/probability
     Manual,     // Researcher-injected via UI
+    Scheduled,  // From a FaultSchedule scenario
 }
 ```
 
@@ -103,7 +104,7 @@ Regardless of type or source, every fault goes through the same pipeline:
 1. **Heat/FaultCheck** phase: fault is registered, agent state updated, cell obstacle status updated
 2. **ADG construction**: Agent Dependency Graph identifies which agents' paths are blocked by the new state
 3. **BFS propagation**: cascade depth and spread computed
-4. **Replan** phase: affected agents get new plans from PIBT
+4. **Replan** phase: affected agents get new plans from the active solver
 5. **Metrics**: MTTR, cascade depth/spread, throughput delta computed in `AnalysisSet::Metrics`
 
 See [Cascade Propagation](/docs/researchers/fault-mechanics/breakdown-faults) for the ADG pipeline in detail.

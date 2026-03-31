@@ -26,9 +26,9 @@ Picks any walkable cell uniformly at random as the next goal. Agents spread acro
 
 ### Closest-first
 
-Assigns the nearest pickup or delivery cell by Manhattan distance. Falls back to random if all nearby cells are occupied.
+Two-phase batch assignment. Phase 1 creates random task candidates from all pickup cells. Phase 2 assigns each agent the nearest task from the random pool via greedy matching. This eliminates positional convergence (all agents heading to the same column) while preserving locality benefit.
 
-- **Resilience profile:** Higher baseline throughput (shorter travel), but agents cluster around popular zones, leading to higher cascade depth under faults
+- **Resilience profile:** Higher baseline throughput (shorter travel), but agents can still cluster around popular zones, leading to higher cascade depth under faults
 - **Use case:** Tests whether optimizing for efficiency hurts fault resilience
 
 ### Balanced
@@ -47,12 +47,17 @@ Warehouse-aware scheduler that minimizes total round-trip distance. For pickups,
 
 ## Task Model
 
-Agents follow a **2-leg task cycle** using zones defined by the topology:
+Agents follow an **8-state task cycle** using zones defined by the topology:
 
-1. **Idle** → Scheduler assigns a pickup cell from the topology's pickup zone
-2. **Pickup** → Agent travels to pickup cell, then scheduler assigns a delivery cell
-3. **Delivery** → Agent travels to delivery cell, throughput increments, cycle repeats
+1. **Free** → Scheduler assigns a pickup cell from the topology's pickup zone
+2. **TravelEmpty** → Agent travels to pickup cell (no cargo)
+3. **Loading** → Agent loads cargo at pickup cell (1-tick minimum dwell)
+4. **TravelToQueue** → Agent travels to the back of a delivery queue line
+5. **Queuing** → Agent shuffles forward in queue (one slot per tick)
+6. **TravelLoaded** → Agent travels to delivery cell (promoted from queue front)
+7. **Unloading** → Agent unloads cargo at delivery cell
+8. **Free** → Task complete (throughput increments), cycle repeats
 
-Each completed delivery = one throughput unit.
+Each completed delivery = one throughput unit. If the topology has no queue lines, agents skip steps 4-5 and go directly from Loading to TravelLoaded.
 
 Each scheduler produces a distinct resilience profile under the same fault conditions, and that comparison is the research output MAFIS is built to generate.

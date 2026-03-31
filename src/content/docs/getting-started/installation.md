@@ -13,7 +13,7 @@ No installation needed. Open the simulator URL and start experimenting.
 
 **Requirements:** A modern browser (Chrome, Firefox, Edge) with WebGL support.
 
-> [!NOTE] The web version runs up to 500 agents at 60 FPS. For larger experiments or batch runs, use the desktop version.
+> [!NOTE] The web version supports up to 1,000 agents. For larger experiments or batch runs, use the desktop version (up to 5,000 agents).
 
 ---
 
@@ -97,7 +97,7 @@ For logic changes (solver, analysis, metrics), you don't need the full WASM buil
 
 ```bash
 cargo check   # Type + borrow check (~5s)
-cargo test    # Run all tests (~3 min, 473 tests)
+cargo test    # Run all tests (~10s, 473 tests)
 ```
 
 Only build WASM when touching rendering, the JS bridge, or visual elements.

@@ -20,7 +20,7 @@ All randomness in MAFIS flows through a single seeded random number generator (C
 
 | Parameter | Options | Effect |
 |---|---|---|
-| **Topology** | Warehouse Medium, Kiva Large, Sorting Center, Compact Grid | Grid layout and zone definitions |
+| **Topology** | Warehouse Medium, Warehouse Large, Compact Grid, Kiva Warehouse, Sorting Center, Fulfillment Center | Grid layout and zone definitions |
 | **Agent count** | Slider | Number of agents spawned |
 | **Seed** | Input | RNG seed for reproducibility |
 | **Scheduler** | Random, Closest-first, Balanced, RoundTrip | Task assignment strategy |
@@ -33,12 +33,14 @@ All randomness in MAFIS flows through a single seeded random number generator (C
 
 MAFIS provides pre-built topologies that define grid layout, obstacle placement, and **zone maps** (pickup, delivery, and corridor zones for the task scheduler). All topologies are stored as JSON files in `topologies/` with a `manifest.json`.
 
-| Topology | Size | Suggested agents | Characteristic |
+| Topology | Size | Agents | Characteristic |
 |---|---|---|---|
-| **Warehouse Medium** | 32 × 21 | 30–100 | Balanced for most research |
-| **Kiva Large** | 57 × 33 | 100–300 | Stress testing, cascade analysis |
-| **Sorting Center** | 40 × 20 | 30–120 | Linear flow layout |
-| **Compact Grid** | 24 × 24 | 20–80 | Dense grid, high congestion |
+| **Warehouse Medium** | 30 × 15 | 13 | Balanced for most research |
+| **Warehouse Large** | 57 × 33 | 60 | Stress testing, cascade analysis |
+| **Compact Grid** | 26 × 26 | 25 | Dense grid, high congestion |
+| **Kiva Warehouse** | 48 × 48 | 80 | Large-scale Kiva-style layout |
+| **Sorting Center** | 45 × 20 | 40 | Linear flow layout |
+| **Fulfillment Center** | 54 × 24 | 36 | Multi-dock fulfillment facility |
 
 ## Fault Scenarios
 

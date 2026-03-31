@@ -17,11 +17,11 @@ Different solvers, fault types, and topologies produce different degradation and
 
 | Variable | Options |
 |---|---|
-| **Solver** | PIBT, RHCR (3 variants), Token Passing, RT-LaCAM, TPTS, PIBT+APF |
-| **Fault type** | Burst, Wear-based, Zone outage, Intermittent |
-| **Grid topology** | Warehouse Medium, Kiva Large, Sorting Center, Compact Grid |
-| **Agent density** | Configurable (slider) |
-| **Scheduler strategy** | Random, Closest-first, Balanced, RoundTrip |
+| **Solver** | PIBT, PIBT+APF, RHCR (PBS, PIBT-Window, Priority A*), Token Passing, TPTS, RT-LaCAM |
+| **Fault type** | Burst, Wear-based (Weibull), Zone outage, Intermittent, Permanent zone outage |
+| **Grid topology** | Warehouse Medium, Warehouse Large, Compact Grid, Kiva Warehouse, Sorting Center, Fulfillment Center |
+| **Agent density** | Configurable (up to 500 agents) |
+| **Scheduler strategy** | Random, Closest, Balanced, Roundtrip |
 
 MAFIS is built to study how solver architecture, fault type, and topology interact under sustained fault conditions.
 
@@ -29,10 +29,10 @@ MAFIS is built to study how solver architecture, fault type, and topology intera
 
 Every fault injection run produces a four-metric **Resilience Scorecard**:
 
-- **Fault Tolerance** : throughput retained under faults (Milner 2023)
-- **NRR** : operational uptime ratio, recovery speed vs fault frequency (Or 2025)
-- **Fleet Utilization** : fraction of the fleet still productive after faults
-- **Critical Time** : fraction of time spent in a critically degraded state (Ghasemieh 2024)
+- **Fault Tolerance** — throughput retained under faults
+- **NRR** — operational uptime ratio, recovery speed vs fault frequency
+- **Fleet Utilization** — fraction of the fleet still productive after faults
+- **Critical Time** — fraction of time spent in a critically degraded state
 
 See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) for formulas and examples.
 
