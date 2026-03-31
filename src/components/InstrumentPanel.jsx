@@ -7,14 +7,14 @@ const ITEMS = [
     bullets: ['Recoverable: temporary blockage', 'Permanent-distributed: overheat', 'Permanent-localized: zone outage'],
     visual: 'taxonomy' },
   { id: 'solvers', num: '02', label: 'Solvers',
-    title: 'Five lifelong solvers',
-    desc: 'All lifelong-capable. Built for sustained operation.',
-    bullets: ['PIBT: reactive priority inheritance', 'RHCR: three windowed planner variants', 'Token Passing: decentralized sequential'],
+    title: 'Eight lifelong solvers',
+    desc: 'All lifelong-capable. Five paradigms for sustained operation.',
+    bullets: ['PIBT, PIBT+APF: reactive', 'RHCR: three windowed planner variants', 'Token Passing, TPTS: decentralized', 'RT-LaCAM: config-space search'],
     visual: 'solvers' },
   { id: 'topologies', num: '03', label: 'Topologies',
-    title: 'Four warehouse maps',
+    title: 'Six warehouse maps',
     desc: 'Cross-topology validation built in.',
-    bullets: ['Warehouse Medium 32\u00D721', 'Kiva Large 57\u00D733', 'Sorting Center 40\u00D720', 'Compact Grid 24\u00D724'],
+    bullets: ['Warehouse Medium 30\u00D715', 'Warehouse Large 57\u00D733', 'Compact Grid 26\u00D726', 'Kiva Warehouse 48\u00D748', 'Sorting Center 45\u00D720', 'Fulfillment Center 54\u00D724'],
     visual: 'topologies' },
   { id: 'baseline', num: '04', label: 'Baseline Model',
     title: 'Dual-twin baseline',
@@ -57,18 +57,21 @@ function TaxonomySvg() {
 function SolversSvg() {
   const solvers = [
     { name: 'PIBT', w: 200, color: C.teal },
-    { name: 'RHCR-PBS', w: 170, color: C.teal },
-    { name: 'RHCR-PIBT', w: 180, color: C.teal },
+    { name: 'PIBT+APF', w: 190, color: C.teal },
+    { name: 'RHCR-PBS', w: 170, color: C.amber },
+    { name: 'RHCR-PIBT', w: 180, color: C.amber },
     { name: 'RHCR-A*', w: 160, color: C.amber },
     { name: 'TOKEN', w: 140, color: C.green },
+    { name: 'TPTS', w: 150, color: C.green },
+    { name: 'RT-LaCAM', w: 175, color: C.red },
   ];
   return (
-    <svg width="280" height="140" viewBox="0 0 280 140">
+    <svg width="280" height="180" viewBox="0 0 280 180">
       {solvers.map((s, i) => (
         <g key={s.name}>
-          <rect x="80" y={8 + i * 26} width={s.w} height="18" fill={s.color} opacity="0.2" />
-          <rect x="80" y={8 + i * 26} width={s.w} height="18" fill="none" stroke={s.color} strokeWidth="1" opacity="0.5" />
-          <text x="72" y={8 + i * 26 + 13} textAnchor="end" fill={C.textSec} fontFamily="var(--mono)" fontSize="10">{s.name}</text>
+          <rect x="80" y={8 + i * 21} width={s.w} height="15" fill={s.color} opacity="0.2" />
+          <rect x="80" y={8 + i * 21} width={s.w} height="15" fill="none" stroke={s.color} strokeWidth="1" opacity="0.5" />
+          <text x="72" y={8 + i * 21 + 11} textAnchor="end" fill={C.textSec} fontFamily="var(--mono)" fontSize="9">{s.name}</text>
         </g>
       ))}
     </svg>
@@ -76,25 +79,27 @@ function SolversSvg() {
 }
 
 function TopologiesSvg() {
-  const labels = ['WH-MED', 'KIVA-LG', 'SORT-CTR', 'COMPACT'];
+  const labels = ['WH-MED', 'WH-LG', 'COMPACT', 'KIVA', 'SORT-CTR', 'FULFILL'];
   const patterns = [
     [[0,0],[0,2],[0,4],[2,0],[2,2],[2,4],[4,0],[4,2],[4,4]],
     [[0,0],[0,1],[0,3],[0,4],[1,0],[1,4],[3,0],[3,4],[4,0],[4,1],[4,3],[4,4]],
-    [[0,0],[1,1],[2,2],[3,3],[4,4],[0,4],[4,0]],
     [[0,0],[0,1],[0,2],[0,3],[0,4],[1,0],[1,4],[2,0],[2,4],[3,0],[3,4],[4,0],[4,1],[4,2],[4,3],[4,4]],
+    [[0,0],[0,2],[0,4],[1,1],[1,3],[2,0],[2,2],[2,4],[3,1],[3,3],[4,0],[4,2],[4,4]],
+    [[0,0],[1,1],[2,2],[3,3],[4,4],[0,4],[4,0]],
+    [[0,0],[0,4],[1,2],[2,0],[2,4],[3,2],[4,0],[4,4]],
   ];
   return (
-    <svg width="280" height="160" viewBox="0 0 280 160">
-      {[0,1,2,3].map(idx => {
+    <svg width="280" height="200" viewBox="0 0 280 200">
+      {[0,1,2,3,4,5].map(idx => {
         const col = idx % 2, row = Math.floor(idx / 2);
-        const ox = 20 + col * 140, oy = 10 + row * 80;
+        const ox = 20 + col * 140, oy = 10 + row * 66;
         return (
           <g key={idx}>
-            <rect x={ox} y={oy} width="110" height="55" fill="none" stroke={C.border} strokeWidth="1" />
+            <rect x={ox} y={oy} width="110" height="45" fill="none" stroke={C.border} strokeWidth="1" />
             {patterns[idx].map((p, pi) => (
-              <rect key={pi} x={ox + 8 + p[1] * 18} y={oy + 5 + p[0] * 9} width="8" height="6" fill={C.teal} opacity="0.4" />
+              <rect key={pi} x={ox + 8 + p[1] * 18} y={oy + 4 + p[0] * 7} width="8" height="5" fill={C.teal} opacity="0.4" />
             ))}
-            <text x={ox + 55} y={oy + 72} textAnchor="middle" fill={C.textSec} fontFamily="var(--mono)" fontSize="8">{labels[idx]}</text>
+            <text x={ox + 55} y={oy + 58} textAnchor="middle" fill={C.textSec} fontFamily="var(--mono)" fontSize="7">{labels[idx]}</text>
           </g>
         );
       })}
