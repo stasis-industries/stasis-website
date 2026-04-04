@@ -33,7 +33,7 @@ Level 3: agents whose paths conflict with Level 2's new plans
 
 BFS terminates when no new conflicts are introduced at a given level. The depth is the number of levels reached.
 
-In MAFIS, this is implemented in `propagate_cascade` (`src/fault/breakdown.rs`), which runs in `FaultSet::FaultCheck` before the replan phase.
+In MAFIS, this is implemented in `propagate_cascade` (`src/analysis/cascade.rs`), which runs in `AnalysisSet::Cascade` after the fault check phase.
 
 ## FaultEventRecord
 
@@ -41,23 +41,21 @@ Each fault event is recorded as a `FaultEventRecord` with impact data filled pro
 
 ```rust
 struct FaultEventRecord {
-    id: u32,
+    id: usize,
     tick: u64,
     fault_type: FaultType,
     source: FaultSource,
-    entity: Entity,
     position: IVec2,
 
     agents_affected: u32,       // cascade spread
     cascade_depth: u32,
-    throughput_at_fault: f32,   // throughput the tick before
-    throughput_min_after: f32,  // lowest throughput in recovery window
-    throughput_delta_pct: f32,  // percentage drop
+    throughput_before: f32,     // throughput the tick before
+    throughput_min: f32,        // lowest throughput in recovery window
+    throughput_delta: f32,      // throughput drop
 
-    recovery_start_tick: Option<u64>,
-    recovery_end_tick: Option<u64>,
-    recovery_duration: Option<u64>,
     recovered: bool,
+    recovery_tick: Option<u64>,
+    alive_at_event: u32,        // live fleet size at fault time (propagation rate denominator)
 }
 ```
 

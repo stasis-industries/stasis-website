@@ -11,17 +11,11 @@ In lifelong MAPF, agents continuously receive new tasks after completing their c
 
 Picks a pickup or delivery cell uniformly at random. Serves as the baseline scheduler.
 
-### Closest-first
+### Closest
 
 Two-phase batch assignment. Phase 1 creates random task candidates from all pickup cells. Phase 2 assigns each agent the nearest task from the pool via greedy matching. Preserves locality benefit without positional convergence.
 
-### Balanced
-
-Assigns tasks to the least-recently-used cell, breaking ties by distance. Biases future assignments toward under-occupied regions.
-
-### Round-trip
-
-Minimizes total round-trip distance. For pickups, selects the cell that minimizes `dist(agent → pickup) + min(dist(pickup → any delivery cell))`. For deliveries, selects the nearest delivery cell.
+Both schedulers are intentionally fault-blind: dead agents are pre-filtered before the scheduler sees them. The schedulers have no awareness of congestion, queue state, or blocked zones. This rigid design isolates solver behavior as the experimental variable.
 
 ## Task Model
 

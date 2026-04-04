@@ -66,12 +66,11 @@ $$NRR = 1 - \frac{MTTR}{MTBF}$$
 
 *How much of the fleet remains productive after faults?*
 
-$$FU = \frac{\text{alive} + \text{tasked agents (post-fault average)}}{\text{initial fleet size}}$$
+$$FU = \frac{\text{alive and tasked agents (post-fault average)}}{\text{initial fleet size}}$$
 
 | Variable | Meaning |
 |---|---|
-| alive agents | Agents that have not been permanently disabled by faults |
-| tasked agents | Alive agents currently executing a pickup or delivery leg |
+| alive and tasked agents | Agents that are alive AND currently executing a task (not idle/free) |
 | initial fleet size | Total agents at simulation start |
 
 - **Range:** 0 (all agents dead or idle) → 1 (full fleet operational and productive)

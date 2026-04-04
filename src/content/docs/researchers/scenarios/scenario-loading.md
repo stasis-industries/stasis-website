@@ -23,7 +23,7 @@ All randomness in MAFIS flows through a single seeded random number generator (C
 | **Topology** | Warehouse Medium, Warehouse Large, Compact Grid, Kiva Warehouse, Sorting Center, Fulfillment Center | Grid layout and zone definitions |
 | **Agent count** | Slider | Number of agents spawned |
 | **Seed** | Input | RNG seed for reproducibility |
-| **Scheduler** | Random, Closest-first, Balanced, RoundTrip | Task assignment strategy |
+| **Scheduler** | Random, Closest | Task assignment strategy |
 | **Solver** | PIBT, RHCR (3 variants), Token Passing, RT-LaCAM, TPTS | Path planning algorithm |
 | **Fault intensity** | Off / Low / Medium / High | Fault frequency and severity |
 | **Baseline ticks** | Input (default: configurable) | Duration of headless fault-free baseline |

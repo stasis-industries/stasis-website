@@ -97,7 +97,7 @@ For logic changes (solver, analysis, metrics), you don't need the full WASM buil
 
 ```bash
 cargo check   # Type + borrow check (~5s)
-cargo test    # Run all tests (~10s, 473 tests)
+cargo test    # Run all tests (~10s, 553 tests)
 ```
 
 Only build WASM when touching rendering, the JS bridge, or visual elements.

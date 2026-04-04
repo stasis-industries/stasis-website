@@ -20,8 +20,8 @@ Different solvers, fault types, and topologies produce different degradation and
 | **Solver** | PIBT, RHCR (PBS, PIBT-Window, Priority A*), Token Passing, TPTS, RT-LaCAM |
 | **Fault type** | Burst, Wear-based (Weibull), Zone outage, Intermittent, Permanent zone outage |
 | **Grid topology** | Warehouse Medium, Warehouse Large, Compact Grid, Kiva Warehouse, Sorting Center, Fulfillment Center |
-| **Agent density** | Configurable (up to 500 agents) |
-| **Scheduler strategy** | Random, Closest, Balanced, Roundtrip |
+| **Agent density** | Configurable (up to 1,000 agents in WASM, 5,000 native) |
+| **Scheduler strategy** | Random, Closest |
 
 MAFIS is built to study how solver architecture, fault type, and topology interact under sustained fault conditions.
 
@@ -41,7 +41,7 @@ See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) f
 | | Web (WASM) | Desktop (Native) |
 |---|---|---|
 | **Install** | None (runs in browser) | Download binary |
-| **Performance** | 500 agents, 60 FPS | 1000+ agents, parallel computation |
+| **Performance** | 1,000 agents, 60 FPS | 5,000 agents, parallel computation |
 | **Interface** | HTML/CSS/JS controls | Full Egui panel system |
 | **Use case** | Quick experiments, demos | Batch experiments, parameter sweeps |
 

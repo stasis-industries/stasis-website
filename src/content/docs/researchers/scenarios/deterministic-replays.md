@@ -7,29 +7,27 @@ MAFIS records a complete snapshot of the simulation state every tick during the 
 
 ## Architecture: Snapshot Ring Buffer
 
-Every tick during fault injection, the `record_tick_snapshot` system stores a complete `TickSnapshot`:
+Every tick during fault injection, the `record_tick_snapshot` system stores a complete `FullTickSnapshot`:
 
 ```rust
-struct TickSnapshot {
+struct FullTickSnapshot {
     tick: u64,
-    phase: SimulationPhase,
-    agents: Vec<AgentSnapshot>,        // ~40 bytes/agent
-    obstacle_additions: Vec<IVec2>,    // obstacles added since simulation start (diff, not full grid)
-    metrics: MetricsSnapshot,          // all metric values + scorecard values
-    fault_events: Vec<FaultEventRecord>, // events that fired on this tick
+    phase: String,
+    agents: Vec<AgentSnapshot>,
+    metrics: MetricsSnapshot,
+    fault_event_count: u32,
+    // + internal RNG state for determinism verification
 }
 
 struct AgentSnapshot {
-    entity_index: u32,
+    index: usize,
     pos: IVec2,
     goal: IVec2,
     heat: f32,
     is_dead: bool,
-    plan_length: u16,
-    last_action: Action,
-    total_actions: u32,
-    wait_actions: u32,
-    move_actions: u32,
+    plan_length: usize,
+    task_leg: String,
+    operational_age: u32,
 }
 ```
 
@@ -37,7 +35,7 @@ Snapshots are stored in `TickHistory`:
 
 ```rust
 struct TickHistory {
-    snapshots: Vec<TickSnapshot>,
+    snapshots: VecDeque<FullTickSnapshot>,
     replay_cursor: Option<usize>,  // None = live, Some(idx) = viewing historical tick
     recording: bool,               // true during fault injection phase
 }
@@ -60,13 +58,17 @@ struct TickHistory {
 ## SimState Machine
 
 ```
-Start ──▶ Running ──── Pause ──▶ Paused ──── Seek ──▶ Replay
-                       ◀── Resume ──                  ◀── Resume ──▶ Running
+Idle ──▶ Loading ──▶ Running ──── Pause ──▶ Paused ──── Seek ──▶ Replay
+                                  ◀── Resume ──          ◀── Resume ──▶ Running
+                                                                        ──▶ Finished
 ```
 
+- **Idle:** initial state, waiting for configuration
+- **Loading:** topology and agents being initialized
 - **Running:** simulation advancing, snapshots recording
 - **Paused:** simulation frozen, camera still interactive, manual fault injection available
 - **Replay:** reading from snapshot buffer, all simulation systems inactive, 3D scene reconstructed from snapshot
+- **Finished:** simulation completed (task limit reached or manually stopped)
 
 > [!IMPORTANT] Resume from Replay returns to Running and continues from where the simulation was paused (not from the replayed tick). Rewind is read-only. There is no branching from a past tick.
 
@@ -121,6 +123,6 @@ Manual faults are tagged `FaultSource::Manual` but go through the same cascade p
 ## Code Location
 
 - `src/analysis/history.rs` : `TickSnapshot`, `TickHistory`, `record_tick_snapshot`
-- `src/core/state.rs` : `SimState` (Running, Paused, Replay, Finished)
+- `src/core/state.rs` : `SimState` (Idle, Loading, Running, Paused, Replay, Finished)
 - `src/render/animator.rs` : replay rendering from snapshot
-- `src/ui/bridge.rs` : `seek_to_tick`, `step_backward`, `step_forward` commands
+- `src/ui/bridge/commands.rs` : `seek_to_tick`, `step_backward`, `step_forward` commands

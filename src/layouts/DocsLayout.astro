@@ -42,7 +42,7 @@ const navGroups = [
     items: [
       { label: 'Fault Types', slug: 'researchers/fault-mechanics/chaos-engineering' },
       { label: 'Cascade Propagation', slug: 'researchers/fault-mechanics/breakdown-faults' },
-      { label: 'Heat System', slug: 'researchers/fault-mechanics/heat-faults' },
+      { label: 'Wear & Heat System', slug: 'researchers/fault-mechanics/heat-faults' },
     ]
   },
   {
@@ -460,14 +460,8 @@ const nextPage = currentIndex !== -1 && currentIndex < flatItems.length - 1 ? fl
     display: flex;
     flex-direction: column;
     gap: 4px;
-    animation: slideDown 0.3s ease-out forwards;
-    transform-origin: top;
   }
   
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px) scaleY(0.95); }
-    to { opacity: 1; transform: translateY(0) scaleY(1); }
-  }
 
   .sidebar-link {
     font-family: var(--sans);

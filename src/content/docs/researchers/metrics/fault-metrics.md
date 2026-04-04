@@ -125,13 +125,13 @@ Number of tasks completed at each tick. The instantaneous count of agents that r
 
 Fraction of ticks where agents wait instead of moving. Measures fleet utilization.
 
-**Origin:** Standard utilization metric. Dead agents contribute 100% idle (they can never move again), which makes the metric sensitive to fleet attrition.
+**Origin:** Standard utilization metric. Dead agents are **excluded** from the calculation — their fleet loss is captured by survival rate and fleet utilization. Counting dead agents as permanently idle would make this metric unresponsive to late-stage events (old deaths would dominate the cumulative sum).
 
 **Why it matters:** Two configurations can have identical throughput but different idle ratios. One achieves it with fluid movement (10% idle), the other with stop-and-go waves (50% idle). Idle ratio reveals the congestion signature of each scheduler.
 
-**Real-life example:** 500 robots, 40% idle ratio = you're paying for 500 but getting the output of 300. Under faults, idle ratio spikes because agents queue behind blockages. A fleet operator asks: "Am I over-provisioning or under-routing?"
+**Real-life example:** 500 robots, 40% idle ratio among the alive fleet = your operational robots spend 40% of their time waiting. Under faults, idle ratio spikes because surviving agents queue behind new blockages. A fleet operator asks: "Are my surviving robots working efficiently, or are they mostly stuck?"
 
-> [!TIP] **Animation:** A grid of agents. Moving agents are green, waiting agents are grey. The ratio of grey to total fills a bar labeled "Idle Ratio." After a fault, the grey ratio spikes then slowly recovers.
+> [!TIP] **Animation:** A grid of agents. Moving agents are green, waiting agents are grey. Dead agents are red (not counted in ratio). The ratio of grey to green+grey fills a bar labeled "Idle Ratio." After a fault, the grey ratio spikes then slowly recovers.
 
 ---
 
