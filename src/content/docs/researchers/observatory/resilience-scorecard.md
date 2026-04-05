@@ -53,7 +53,7 @@ $$NRR = 1 - \frac{MTTR}{MTBF}$$
 - **Range:** 0 (always recovering) → 1 (recovers instantly relative to fault frequency)
 - **Weight in composite:** 25% (redistributed to other metrics when N/A)
 - **Requires** at least 2 fault events to compute MTBF, and at least one cascade-affected agent for MTTR.
-- **N/A when:** single-event faults (burst, zone outage, permanent zone outage) or permanent deaths with no cascade neighbors. When N/A, the composite score redistributes NRR's weight: FT 40%, FU 33%, CT 27%.
+- **N/A when:** all fault events occur at the same tick (burst, zone outage) — MTBF is undefined with no inter-arrival intervals. Also N/A for permanent deaths with no cascade neighbors. When N/A, the composite score redistributes NRR's weight: FT 40%, FU 33%, CT 27%.
 
 **Origin:** Or (2025), *"MTTR-A: Measuring Cognitive Recovery Latency in Multi-Agent Systems"*, which defines NRR as the uptime bound, proving that steady-state operational fraction satisfies $\pi_{up} \geq NRR$.
 

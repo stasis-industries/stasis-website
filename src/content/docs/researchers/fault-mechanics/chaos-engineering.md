@@ -1,9 +1,9 @@
 ---
 title: Fault Types
-description: The three fault types in MAFIS (Overheat, Breakdown, Latency), the five fault scenarios, and how FaultSource distinguishes automatic from manual injection.
+description: The three fault types in MAFIS (Overheat, Breakdown, Latency), the four fault scenarios, and how FaultSource distinguishes automatic from manual injection.
 ---
 
-MAFIS has three **fault types** that describe what happens to an agent, and five **fault scenarios** that describe how and when faults are triggered. All fault events go through the same cascade pipeline (ADG → BFS → replan), which makes their resilience metrics scientifically comparable regardless of how they were triggered.
+MAFIS has three **fault types** that describe what happens to an agent, and four **fault scenarios** that describe how and when faults are triggered. All fault events go through the same cascade pipeline (ADG → BFS → replan), which makes their resilience metrics scientifically comparable regardless of how they were triggered.
 
 ## Fault Types (What Happens)
 
@@ -39,9 +39,8 @@ Scenarios define the injection pattern. Each scenario uses one or more fault typ
 |---|---|---|---|
 | **BurstFailure** | Kill X% agents at tick T | Breakdown | Permanent |
 | **WearBased** | Weibull model: agents die when `operational_age >= sampled failure tick` | Overheat | Permanent |
-| **ZoneOutage** | Latency on agents in busiest zone for N ticks | Latency | Temporary |
+| **ZoneOutage** | Latency on all agents in a randomly-selected spatial strip for N ticks | Latency | Temporary |
 | **IntermittentFault** | Per-agent recurring latency (exponential inter-arrival) | Latency | Temporary |
-| **PermanentZoneOutage** | Block cells in busiest zone at tick T | Breakdown | Permanent (terrain) |
 
 ### BurstFailure
 
@@ -53,21 +52,15 @@ The continuous Weibull wear model. Each agent has a pre-sampled failure time. As
 
 ### ZoneOutage
 
-Injects latency on all agents currently in the busiest zone for N ticks. Agents freeze temporarily but recover. Tests how the system handles zone-level disruption without permanent loss.
+Injects latency on all agents currently within a randomly-selected vertical strip of the map for N ticks. The strip is chosen using the simulation's seeded RNG at fault-fire time — deterministic per seed and independent of solver routing behavior. Agents freeze temporarily but recover. Models a localized network dead zone or power failure in a specific warehouse aisle section.
+
+Parameters:
+- `zone_at_tick`: when the outage fires
+- `zone_latency_duration`: how many ticks agents in the strip are frozen
 
 ### IntermittentFault
 
 Per-agent recurring latency with exponential inter-arrival times. Each agent independently experiences temporary unavailability. Controlled by `intermittent_mtbf_ticks` (average time between faults) and `intermittent_recovery_ticks` (how long each episode lasts).
-
-### PermanentZoneOutage
-
-Blocks cells in the busiest zone at a configurable tick. Agents standing on blocked cells die immediately. All task assignments into the zone are invalidated. This is the most destructive scenario — a 100% blockage removes all zone cells from the operational map permanently.
-
-Parameters:
-- `at_tick`: when the blockage fires
-- `block_percent`: fraction of zone cells to block (1–100%; default 100%)
-
-> [!WARNING] PermanentZoneOutage is the most destructive scenario. A 100% blockage removes all zone cells from the operational map for the remainder of the run. This tests a failure mode that prior work on *k*-robust MAPF and delay-based fault models does not cover.
 
 ## FaultSource
 

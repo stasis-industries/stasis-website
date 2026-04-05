@@ -49,8 +49,7 @@ Beyond manual fault injection (clicking on agents during a run), MAFIS supports 
 - Kill agent at tick T
 - Place obstacle at position (x, y) at tick T
 - Inject latency for N ticks at tick T
-- Temporary blockage for N ticks at tick T
-- Permanent zone outage at tick T (block N% of busiest zone cells)
+- Spatial zone outage at tick T (latency on all agents in a randomly-selected vertical strip)
 
 Scheduled scenarios ensure identical fault conditions across comparison runs with different scheduler or topology configurations.
 

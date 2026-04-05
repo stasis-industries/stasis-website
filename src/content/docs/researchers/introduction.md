@@ -18,7 +18,7 @@ Different solvers, fault types, and topologies produce different degradation and
 | Variable | Options |
 |---|---|
 | **Solver** | PIBT, RHCR (PBS, PIBT-Window, Priority A*), Token Passing, TPTS, RT-LaCAM |
-| **Fault type** | Burst, Wear-based (Weibull), Zone outage, Intermittent, Permanent zone outage |
+| **Fault type** | Burst, Wear-based (Weibull), Spatial zone outage, Intermittent |
 | **Grid topology** | Warehouse Medium, Warehouse Large, Compact Grid, Kiva Warehouse, Sorting Center, Fulfillment Center |
 | **Agent density** | Configurable (up to 1,000 agents in WASM, 5,000 native) |
 | **Scheduler strategy** | Random, Closest |
