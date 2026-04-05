@@ -87,15 +87,17 @@ The total number of agents affected by a single fault event, not chain length, b
 
 ---
 
-## Propagation Rate
+## Propagation Rate (Observatory Only)
 
 **Unit:** Ratio (0–1) | **Lower is better**
 
-Fraction of the live fleet affected per fault event, averaged across all events. Normalizes cascade spread by fleet size.
+Fraction of the live fleet affected per fault event, averaged across all events. Normalizes cascade spread by fleet size. Uses ADG-based cascade count (includes indirect dependencies), not just direct faults.
 
 **Origin:** Normalized version of cascade spread. A spread of 20 agents means something very different in a 50-agent fleet (40% affected) versus a 500-agent fleet (4% affected).
 
 **Why it matters:** Propagation rate makes results comparable across different fleet sizes and configurations. It answers: "What fraction of my operational fleet gets disrupted by each incident?"
+
+> [!NOTE] **Observatory only.** This metric is computed in the live observatory using the full ADG cascade analysis. It is not included in headless experiment exports because the experiment pipeline uses cascade depth and cascade spread as separate, more precise metrics.
 
 **Real-life example:** A 200-robot warehouse has propagation rate 0.08, meaning each fault disrupts 8% of the fleet. Scaling to 400 robots, if propagation rate stays at 0.08, each fault still disrupts 8% (now 32 robots). If propagation rate increases, the larger fleet has worse fault isolation.
 
@@ -119,19 +121,19 @@ Number of tasks completed at each tick. The instantaneous count of agents that r
 
 ---
 
-## Idle Ratio
+## Wait Ratio
 
 **Unit:** Percentage (0–100%) | **Lower is better**
 
-Fraction of ticks where agents wait instead of moving. Measures fleet utilization.
+Fraction of actions where alive agents wait instead of moving. Measures fleet congestion.
 
 **Origin:** Standard utilization metric. Dead agents are **excluded** from the calculation — their fleet loss is captured by survival rate and fleet utilization. Counting dead agents as permanently idle would make this metric unresponsive to late-stage events (old deaths would dominate the cumulative sum).
 
-**Why it matters:** Two configurations can have identical throughput but different idle ratios. One achieves it with fluid movement (10% idle), the other with stop-and-go waves (50% idle). Idle ratio reveals the congestion signature of each scheduler.
+**Why it matters:** Two configurations can have identical throughput but different wait ratios. One achieves it with fluid movement (10% waiting), the other with stop-and-go waves (50% waiting). Wait ratio reveals the congestion signature of each solver and scheduler combination.
 
-**Real-life example:** 500 robots, 40% idle ratio among the alive fleet = your operational robots spend 40% of their time waiting. Under faults, idle ratio spikes because surviving agents queue behind new blockages. A fleet operator asks: "Are my surviving robots working efficiently, or are they mostly stuck?"
+**Real-life example:** 500 robots, 40% wait ratio among the alive fleet = your operational robots spend 40% of their actions waiting. Under faults, wait ratio spikes because surviving agents queue behind new blockages. A fleet operator asks: "Are my surviving robots working efficiently, or are they mostly stuck?"
 
-> [!TIP] **Animation:** A grid of agents. Moving agents are green, waiting agents are grey. Dead agents are red (not counted in ratio). The ratio of grey to green+grey fills a bar labeled "Idle Ratio." After a fault, the grey ratio spikes then slowly recovers.
+> [!TIP] **Animation:** A grid of agents. Moving agents are green, waiting agents are grey. Dead agents are red (not counted in ratio). The ratio of grey to green+grey fills a bar labeled "Wait Ratio." After a fault, the grey ratio spikes then slowly recovers.
 
 ---
 
@@ -158,6 +160,7 @@ These raw metrics flow into the [Resilience Scorecard](/docs/researchers/observa
 | Raw Metric | Feeds Into |
 |---|---|
 | Throughput + Baseline | Fault Tolerance (FT) |
-| MTTR + MTBF | NRR |
+| MTTR + MTBF | NRR (observatory only, requires recurring faults) |
 | Fleet attrition + task stalls | Fleet Utilization (FU) |
 | Throughput below threshold | Critical Time (CT) |
+| ADG BFS on fault events | Cascade Depth + Cascade Spread |

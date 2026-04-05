@@ -30,9 +30,10 @@ MAFIS is built to study how solver architecture, fault type, and topology intera
 Every fault injection run produces a four-metric **Resilience Scorecard**:
 
 - **Fault Tolerance** — throughput retained under faults
-- **NRR** — operational uptime ratio, recovery speed vs fault frequency
+- **NRR** — operational uptime ratio, recovery speed vs fault frequency (requires recurring faults)
 - **Fleet Utilization** — fraction of the fleet still productive after faults
 - **Critical Time** — fraction of time spent in a critically degraded state
+- **Cascade Depth / Spread** — how far fault effects propagate through the dependency graph
 
 See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) for formulas and examples.
 
