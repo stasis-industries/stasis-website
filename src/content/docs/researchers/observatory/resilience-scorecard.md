@@ -1,18 +1,18 @@
 ---
 title: Resilience Scorecard
-description: "Four research-backed metrics that characterize how a multi-agent system behaves under sustained faults: Fault Tolerance, NRR, Fleet Utilization, and Critical Time."
+description: "Four indicators that characterize how a multi-agent system behaves under sustained faults: Fault Tolerance, NRR, Survival Rate, and Critical Time."
 ---
 
-The **Resilience Scorecard** is computed live during the fault injection phase. It distills raw metrics into four research-backed indicators that together answer: *is this system resilient, degrading, or collapsing?*
+The **Resilience Scorecard** is computed live during the fault injection phase. It distills raw metrics into research-backed indicators that together answer: *is this system resilient, degrading, or collapsing?*
 
 ```
 RESILIENCE SCORECARD
   Fault Tolerance    0.82
   NRR                0.91
-  Fleet Utilization  0.64
+  Survival Rate      0.88
   Critical Time      0.15
 
-  Composite Score    0.80  →  RESILIENT
+  Composite Score    0.86  →  RESILIENT
 ```
 
 ---
@@ -29,7 +29,7 @@ $$FT = \frac{P_{\text{fault}}}{P_{\text{nominal}}}$$
 | $P_{\text{nominal}}$ | Baseline throughput (fault-free) |
 
 - **Range:** 0 (no throughput under faults) → 1+ (throughput matches or exceeds baseline)
-- **Weight in composite:** 30%
+- **Weight in composite:** 40%
 
 **Origin:** Adapted from Milner (2023), *"Quantifying Fault Tolerance in Autonomous Multi-Robot Systems"*, which defines fault tolerance as the ratio of degraded performance to nominal performance.
 
@@ -51,9 +51,9 @@ $$NRR = 1 - \frac{MTTR}{MTBF}$$
 | $MTBF$ | Mean Time Between Faults (ticks between fault events) |
 
 - **Range:** 0 (always recovering) → 1 (recovers instantly relative to fault frequency)
-- **Weight in composite:** 25% (redistributed to other metrics when N/A)
+- **Weight in composite:** 35% (redistributed to other metrics when N/A)
 - **Requires** at least 2 fault events to compute MTBF, and at least one cascade-affected agent for MTTR.
-- **N/A when:** all fault events occur at the same tick (burst, zone outage) — MTBF is undefined with no inter-arrival intervals. Also N/A for permanent deaths with no cascade neighbors. When N/A, the composite score redistributes NRR's weight: FT 40%, FU 33%, CT 27%.
+- **N/A when:** all fault events occur at the same tick (burst, zone outage) — MTBF is undefined with no inter-arrival intervals. Also N/A for permanent deaths with no cascade neighbors. When N/A, the composite score redistributes NRR's weight: FT 65%, CT 35%.
 
 **Origin:** Or (2025), *"MTTR-A: Measuring Cognitive Recovery Latency in Multi-Agent Systems"*, which defines NRR as the uptime bound, proving that steady-state operational fraction satisfies $\pi_{up} \geq NRR$.
 
@@ -63,25 +63,25 @@ $$NRR = 1 - \frac{MTTR}{MTBF}$$
 
 ---
 
-## 3. Fleet Utilization (FU)
+## 3. Survival Rate (SR)
 
-*How much of the fleet remains productive after faults?*
+*What fraction of the initial fleet is still alive?*
 
-$$FU = \frac{\text{alive and tasked agents (post-fault average)}}{\text{initial fleet size}}$$
+$$SR = \frac{\text{alive agents (post-fault)}}{\text{initial fleet size}}$$
 
 | Variable | Meaning |
 |---|---|
-| alive and tasked agents | Agents that are alive AND currently executing a task (not idle/free) |
+| alive agents | Agents not permanently killed by a fault |
 | initial fleet size | Total agents at simulation start |
 
-- **Range:** 0 (all agents dead or idle) → 1 (full fleet operational and productive)
-- **Weight in composite:** 25%
+- **Range:** 0 (all agents dead) → 1 (no deaths)
+- **Displayed in scorecard UI but not included in the composite score** — SR is a supporting indicator, not a composite input.
 
-**Interpretation:** Fleet Utilization separates two failure modes: agents killed by faults (fleet shrinkage) versus agents stalled by cascade effects (idle queuing). A system that loses few agents but sees widespread task stalls still scores low. A system that loses agents but immediately reassigns work to surviving agents scores high.
+**Interpretation:** Survival Rate is a direct headcount. It separates fleet attrition (agents lost to faults) from throughput degradation (performance lost without deaths). A system can have high SR (few deaths) but low Fault Tolerance (widespread cascade stalls), or low SR (many deaths) but high FT if surviving agents absorb the work efficiently.
 
-**Real-life example:** A warehouse fleet starts with 100 robots. A fault cascade kills 10 and stalls 20 more. FU = (90 alive, 70 tasked) / 100 = 0.70. A fleet manager asks: "After a fault, how much of my fleet is still doing useful work?" FU = 0.70 means 30 robots are either dead or blocked, a meaningful operational signal even if throughput partially recovers.
+**Real-life example:** A warehouse fleet starts with 100 robots. After a wear-based fault wave, 88 remain alive. SR = 0.88. A fleet manager uses this alongside FT to distinguish: "Did my throughput drop because robots died, or because the survivors got stuck?"
 
-> [!TIP] **Animation concept:** A fleet health bar showing alive agents (grey) and tasked agents (green) as a fraction of the original fleet. Faults chip away at the bar: dead agents turn red, stalled agents turn amber.
+> [!TIP] **Animation concept:** A fleet health bar showing alive agents (green) versus dead agents (red) as a fraction of the original fleet. Faults chip away at the bar as agents die. SR = the green fraction.
 
 ---
 
@@ -97,7 +97,7 @@ $$CT = \frac{t_{\text{below}}}{t_{\text{fault}}}$$
 | $t_{\text{fault}}$ | Total ticks since first fault |
 
 - **Range:** 0 (never critical) → 1 (always critical)
-- **Weight in composite:** 20% (inverted: $1 - CT$)
+- **Weight in composite:** 25% (inverted: $1 - CT$)
 - **Threshold:** 50% of baseline throughput
 
 **Origin:** Adapted from Ghasemieh (2024), *"Transient Analysis of Fault-Tolerant Systems"*, which uses time-below-threshold as a measure of system criticality during transient degradation.
@@ -110,20 +110,27 @@ $$CT = \frac{t_{\text{below}}}{t_{\text{fault}}}$$
 
 ## Composite Score
 
-The four metrics combine into a single resilience score:
+Three metrics combine into a single resilience score. Survival Rate is shown in the UI but not included in the composite.
 
-$$\text{Score} = 0.30 \times FT + 0.25 \times NRR + 0.25 \times FU + 0.20 \times (1 - CT)$$
+**When NRR is available** (recurring faults, 2+ events with distinct ticks):
+
+$$\text{Score} = 0.40 \times FT + 0.35 \times NRR + 0.25 \times (1 - CT)$$
+
+**When NRR is N/A** (burst/zone outage, or no cascade neighbors):
+
+$$\text{Score} = 0.65 \times FT + 0.35 \times (1 - CT)$$
 
 The verdict banner classifies the result:
 
 | Score | Verdict | Meaning |
 |---|---|---|
-| $\geq 0.7$ | **RESILIENT** | System absorbs faults and recovers |
-| $0.4 - 0.7$ | **DEGRADING** | System is losing ground over time |
-| $< 0.4$ | **COLLAPSING** | System cannot sustain operation |
+| $\geq 0.75$ | **RESILIENT** | System absorbs faults and recovers |
+| $0.55 - 0.75$ | **MODERATE** | System is partially degraded |
+| $0.35 - 0.55$ | **DEGRADED** | System is losing ground over time |
+| $< 0.35$ | **FRAGILE** | System cannot sustain operation |
 
 ---
 
 ## Export
 
-All four scorecard values plus the composite score are included in JSON/CSV exports for offline analysis and cross-run comparison.
+All scorecard values plus the composite score are included in JSON/CSV exports for offline analysis and cross-run comparison.

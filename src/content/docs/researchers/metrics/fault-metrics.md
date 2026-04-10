@@ -127,7 +127,7 @@ Number of tasks completed at each tick. The instantaneous count of agents that r
 
 Fraction of actions where alive agents wait instead of moving. Measures fleet congestion.
 
-**Origin:** Standard utilization metric. Dead agents are **excluded** from the calculation — their fleet loss is captured by survival rate and fleet utilization. Counting dead agents as permanently idle would make this metric unresponsive to late-stage events (old deaths would dominate the cumulative sum).
+**Origin:** Standard utilization metric. Dead agents are **excluded** from the calculation — their fleet loss is captured by survival rate. Counting dead agents as permanently idle would make this metric unresponsive to late-stage events (old deaths would dominate the cumulative sum).
 
 **Why it matters:** Two configurations can have identical throughput but different wait ratios. One achieves it with fluid movement (10% waiting), the other with stop-and-go waves (50% waiting). Wait ratio reveals the congestion signature of each solver and scheduler combination.
 
@@ -161,6 +161,6 @@ These raw metrics flow into the [Resilience Scorecard](/docs/researchers/observa
 |---|---|
 | Throughput + Baseline | Fault Tolerance (FT) |
 | MTTR + MTBF | NRR (observatory only, requires recurring faults) |
-| Fleet attrition + task stalls | Fleet Utilization (FU) |
+| Fleet attrition | Survival Rate (SR) |
 | Throughput below threshold | Critical Time (CT) |
 | ADG BFS on fault events | Cascade Depth + Cascade Spread |

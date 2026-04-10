@@ -59,10 +59,18 @@ cargo install --path cli
 ### Run
 
 ```bash
-mafis
+mafis                              # Interactive REPL
+mafis experiment list              # List available experiment presets
+mafis experiment run solver_resilience   # Run a specific experiment
+mafis experiment smoke             # Quick validation (~1s)
+mafis experiment run-all           # Full paper suite
+mafis results list                 # View result files
+mafis results show <file>          # Pretty-print a CSV
 ```
 
-This opens an interactive REPL where you can configure and run experiments, export results to CSV/JSON, and sweep over parameter combinations.
+The REPL mode opens when no subcommand is given. You can also run experiments directly via subcommands.
+
+Experiments use **baseline caching**: configs sharing the same solver/topology/scheduler/agents/seed compute their baseline once and reuse it across fault scenarios, eliminating ~85% of redundant computation in multi-scenario matrices.
 
 ---
 
