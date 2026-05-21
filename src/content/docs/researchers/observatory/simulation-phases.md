@@ -37,10 +37,23 @@ During the live run, MAFIS tracks the gap between live and baseline at every tic
 | Surplus integral | Accumulated throughput surplus (Braess's paradox) |
 | Recovery tick | First tick where live throughput exceeds baseline |
 
+For batch experiment reports, the baseline differential produces six primary metrics:
+
+| Metric | Description |
+|---|---|
+| **Fault Tolerance (FT)** | Throughput retention ratio — $P_{\text{fault}} / P_{\text{baseline}}$ |
+| **Critical Time (CT)** | Fraction of post-fault ticks below 50% baseline |
+| **TWTE** | Time-weighted Throughput Error: time-weighted integral of throughput ratio error after first fault |
+| **Attack Rate (AR)** | Fraction of initial fleet ever directly killed or cascade-affected |
+| **Cascade Depth** | Mean BFS depth on the Action Dependency Graph across fault events |
+| **Rapidity** | Ticks to ≥90% baseline throughput sustained for 5 ticks (recoverable faults only) |
+
+See [Fault Metrics](/docs/researchers/metrics/fault-metrics) for formulas and definitions.
+
 ## Why This Model
 
 The dual-twin model replaced an earlier warmup-based approach. The advantage: the baseline is computed once, instantly, and is available from tick 1. There is no "warm up and wait." The researcher sees fault impact immediately.
 
 The question is never "what is the throughput?" in isolation. It is "how much does throughput deviate from what it would have been without faults, under this (scheduler, topology, fault intensity) configuration?"
 
-See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) for the four metrics computed from the baseline differential.
+See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) for the four live metrics computed from the baseline differential, and [Fault Metrics](/docs/researchers/metrics/fault-metrics) for the six primary experiment metrics.

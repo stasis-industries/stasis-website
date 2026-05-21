@@ -261,10 +261,12 @@ function ScenarioGrid({ compact = false }) {
 
 // ─── Charts Panel (Right) ───────────────────────────────────────────
 const SCORECARD = [
-  { label: 'FAULT TOLERANCE', base: 82, color: C.green },
-  { label: 'NRR', base: 91, color: C.teal },
-  { label: 'FLEET UTIL', base: 64, color: C.amber },
-  { label: 'CRITICAL TIME', base: 15, color: C.textSec },
+  { label: 'FAULT TOLERANCE', base: 67, color: C.green, fmt: v => `0.${String(v).padStart(2,'0')}` },
+  { label: 'CRITICAL TIME', base: 23, color: C.textSec, fmt: v => `0.${String(v).padStart(2,'0')}` },
+  { label: 'TWTE', base: 201, color: C.amber, fmt: v => `${Math.round(v*100).toLocaleString()}` },
+  { label: 'ATTACK RATE', base: 46, color: C.teal, fmt: v => `0.${String(v).padStart(2,'0')}` },
+  { label: 'CASCADE DEPTH', base: 11, color: C.textSec, fmt: v => `0.${String(v).padStart(2,'0')}` },
+  { label: 'RAPIDITY', base: 8, color: C.green, fmt: v => `${v} t` },
 ];
 
 function ChartsPanel() {
@@ -359,9 +361,10 @@ function ScorecardRow({ item, index }) {
     const offset = index * 700;
     let raf;
 
+    const fmt = item.fmt || (v => `0.${String(v).padStart(2, '0')}`);
     function animate(t) {
       const v = base + Math.round(2 * Math.sin((t + offset) * (2 * Math.PI / period)));
-      el.textContent = `0.${String(v).padStart(2, '0')}`;
+      el.textContent = fmt(v);
       raf = requestAnimationFrame(animate);
     }
 
@@ -392,7 +395,7 @@ function ScorecardRow({ item, index }) {
           color: item.color,
         }}
       >
-        0.{String(item.base).padStart(2, '0')}
+        {(item.fmt || (v => `0.${String(v).padStart(2,'0')}`))(item.base)}
       </span>
     </div>
   );

@@ -44,7 +44,7 @@ Batch experiment runs (headless, reproducible) report six differential metrics d
 |---|---|
 | **Fault Tolerance (FT)** | Throughput retention ratio vs fault-free baseline |
 | **Critical Time (CT)** | Fraction of post-fault ticks below 50% baseline |
-| **ITAE** | Time-weighted integral of throughput error — penalizes slow recovery |
+| **TWTE** | Time-weighted Throughput Error — penalizes slow recovery |
 | **Attack Rate (AR)** | Fraction of fleet ever killed or cascade-affected by any fault |
 | **Cascade Depth** | Mean BFS depth on the ADG across all fault events |
 | **Rapidity** | Ticks to ≥90% baseline throughput for 5 consecutive ticks (recoverable faults only) |

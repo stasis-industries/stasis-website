@@ -3,6 +3,8 @@ title: Resilience Scorecard
 description: "Four indicators that characterize how a multi-agent system behaves under sustained faults: Fault Tolerance, NRR, Survival Rate, and Critical Time."
 ---
 
+> [!NOTE] **Live observatory context.** The Resilience Scorecard is the real-time instrument panel for interactive MAFIS sessions. It shows FT, NRR, Survival Rate, and Critical Time as the simulation runs. For batch experiment reporting, MAFIS uses a separate set of differential metrics (FT, CT, TWTE, AR, Cascade Depth, Rapidity) — see [Fault Metrics documentation](/docs/researchers/metrics/fault-metrics).
+
 The **Resilience Scorecard** is computed live during the fault injection phase. It distills raw metrics into research-backed indicators that together answer: *is this system resilient, degrading, or collapsing?*
 
 ```

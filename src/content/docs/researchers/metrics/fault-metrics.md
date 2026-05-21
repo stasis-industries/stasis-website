@@ -13,7 +13,7 @@ MAFIS defines six primary differential metrics for batch experiment reporting:
 |---|---|---|
 | **Fault Tolerance (FT)** | Ratio (0–∞) | Higher is better |
 | **Critical Time (CT)** | Ratio (0–1) | Lower is better |
-| **ITAE** | Tick-weighted error | Lower is better |
+| **TWTE** | Tick-weighted error | Lower is better |
 | **Attack Rate (AR)** | Ratio (0–1) | Lower is better |
 | **Cascade Depth** | Levels (integer) | Lower is better |
 | **Rapidity** | Ticks (recoverable only) | Lower is better |
@@ -102,23 +102,23 @@ The total number of agents affected by a single fault event, not chain length, b
 
 ---
 
-## ITAE (Integral Time-weighted Absolute Error)
+## TWTE (Time-weighted Throughput Error)
 
 **Unit:** Tick-weighted error | **Lower is better** | **Experiment metric**
 
 Time-weighted integral of the throughput ratio error after the first fault. Gives more weight to deviations that persist later into the run, penalizing slow recovery more than a brief initial dip.
 
-$$ITAE = \sum_{t > t_f} (t - t_f) \cdot |1 - R(t)|$$
+$$TWTE = \sum_{t > t_f} (t - t_f) \cdot |1 - R(t)|$$
 
 Where $R(t) = P_{\text{live}}(t) / P_{\text{baseline}}(t)$ and $t_f$ is the first fault tick.
 
-**Origin:** Ogata (2010), *Modern Control Engineering*, 5th ed. The ITAE criterion is a standard integral performance index in control systems, adapted here for throughput ratio tracking. NaN if no fault fires in the run.
+**Origin:** Form adapted from the classical Integral Time-weighted Absolute Error (ITAE) criterion in control engineering (Ogata 2010, *Modern Control Engineering*, 5th ed.), applied here to the throughput-ratio error signal. NaN if no fault fires in the run. The CSV/JSON field name remains `itae` for backward compatibility with frozen experiment outputs.
 
-**Why it matters:** ITAE captures both the magnitude and duration of performance loss in a single number. Two systems can have identical average throughput deficit but very different ITAE if one recovers early and one lingers near the fault level. ITAE rewards fast recovery disproportionately.
+**Why it matters:** TWTE captures both the magnitude and duration of performance loss in a single number. Two systems can have identical average throughput deficit but very different TWTE if one recovers early and one lingers near the fault level. TWTE rewards fast recovery disproportionately.
 
-**Real-life example:** A warehouse fleet drops to 70% throughput after a fault. Fleet A recovers to 95% within 20 ticks. Fleet B stays at 80% for 200 ticks. Fleet A has a much lower ITAE — the brief, early dip accumulates far less time-weighted error than the prolonged plateau.
+**Real-life example:** A warehouse fleet drops to 70% throughput after a fault. Fleet A recovers to 95% within 20 ticks. Fleet B stays at 80% for 200 ticks. Fleet A has a much lower TWTE — the brief, early dip accumulates far less time-weighted error than the prolonged plateau.
 
-> [!TIP] **Reading it:** ITAE = 0 means perfect throughput retention after the fault. ITAE grows with both depth of degradation and recovery time. Compare across configurations with identical fault intensity.
+> [!TIP] **Reading it:** TWTE = 0 means perfect throughput retention after the fault. TWTE grows with both depth of degradation and recovery time. Compare across configurations with identical fault intensity.
 
 ---
 
@@ -156,7 +156,7 @@ Where $T_{\text{rec}}$ is the first tick such that $R(t) \geq 0.90$ for all $t$ 
 
 **NaN for permanent faults:** Wear-based and burst fault scenarios cause permanent deaths. If the fleet never sustains ≥90% throughput for 5 consecutive ticks, Rapidity is undefined (NaN). It is meaningful primarily for zone outage and intermittent fault scenarios where agents can recover.
 
-**Why it matters:** Rapidity directly answers "how fast does this system bounce back?" A fleet with low ITAE but high Rapidity recovered slowly over a long tail. A fleet with high ITAE but low Rapidity dropped hard and came back fast. Both dimensions are needed.
+**Why it matters:** Rapidity directly answers "how fast does this system bounce back?" A fleet with low TWTE but high Rapidity recovered slowly over a long tail. A fleet with high TWTE but low Rapidity dropped hard and came back fast. Both dimensions are needed.
 
 **Real-life example:** After a zone outage clears, a PIBT fleet recovers to ≥90% baseline throughput in 47 ticks. An RHCR fleet recovers in 31 ticks. Rapidity = 47 vs 31. The difference reflects how quickly each solver's replanning propagates through the fleet after the blockage resolves.
 
@@ -252,7 +252,7 @@ See [Resilience Scorecard](/docs/researchers/observatory/resilience-scorecard) f
 |---|---|
 | Baseline-differential throughput | Fault Tolerance (FT) |
 | Ticks below 50% baseline | Critical Time (CT) |
-| Time-weighted throughput error integral | ITAE |
+| Time-weighted throughput error integral | TWTE |
 | Ever-affected agent count / initial fleet | Attack Rate (AR) |
 | ADG BFS depth across fault events | Cascade Depth |
 | Ticks to ≥90% sustained recovery | Rapidity |
