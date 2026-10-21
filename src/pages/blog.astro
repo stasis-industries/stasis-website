@@ -36,11 +36,6 @@ const posts = (await getCollection('blog', ({ data }) => data.status !== 'draft'
             });
             return (
               <a href={`/blog/${post.id}`} class="post-card">
-                {post.data.image && (
-                  <div class="post-image-wrap">
-                    <img src={post.data.image} alt={post.data.imageAlt ?? post.data.title} class="post-image" loading="lazy" />
-                  </div>
-                )}
                 <div class="post-body">
                   <div class="post-meta">
                     {post.data.status === 'preliminary' && (
@@ -52,6 +47,11 @@ const posts = (await getCollection('blog', ({ data }) => data.status !== 'draft'
                   </div>
                   <h2 class="post-title">{post.data.title}</h2>
                   <p class="post-desc">{post.data.description}</p>
+                  {post.data.image && (
+                    <div class="post-image-wrap">
+                      <img src={post.data.image} alt={post.data.imageAlt ?? post.data.title} class="post-image" loading="lazy" />
+                    </div>
+                  )}
                   {post.data.tags && post.data.tags.length > 0 && (
                     <div class="post-tags">
                       {post.data.tags.map(tag => (
@@ -155,15 +155,14 @@ const posts = (await getCollection('blog', ({ data }) => data.status !== 'draft'
   .post-card:hover { opacity: 0.75; }
 
   .post-image-wrap {
-    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 280px;
     border: 1px solid var(--border);
     overflow: hidden;
-    max-height: 280px;
   }
   .post-image {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
     display: block;
   }
 
