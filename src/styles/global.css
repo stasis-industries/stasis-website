@@ -12,9 +12,9 @@
   /* Variant 4 */
   --color-brand-accent-red: #991B1B;
 
-  --font-serif: "Playfair Display", serif;
+  --font-serif: "DM Mono", monospace;
   --font-mono: "DM Mono", monospace;
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "DM Sans", sans-serif;
 }
 
 @layer base {

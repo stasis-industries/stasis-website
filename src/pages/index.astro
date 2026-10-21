@@ -34,6 +34,7 @@ import InstrumentPanel from '../components/InstrumentPanel.jsx';
             MAFIS is a fault injection observatory for lifelong multi-agent
             path finding. Inject faults. Measure degradation. Compare recovery.
           </p>
+          <a href="/blog/paams-2026-best-paper" class="hero-award">Best Paper Award · AREA workshop, PAAMS 2026 →</a>
           <div class="hero-cta">
             <a href="#the-gap" class="btn-primary">See how it works ↓</a>
             <a href="/simulator" class="btn-docs">Try Simulator</a>
@@ -85,19 +86,19 @@ import InstrumentPanel from '../components/InstrumentPanel.jsx';
           <div class="scorecard-grid">
             <div class="scorecard-metric">
               <span class="scorecard-metric-label">Fault Tolerance</span>
-              <span class="scorecard-metric-value sc-green"><span class="counter" data-target="67" data-start="0" data-format="decimal">0</span></span>
+              <span class="scorecard-metric-value sc-green"><span class="counter" data-target="78" data-start="0" data-format="decimal">0</span></span>
             </div>
             <div class="scorecard-metric">
               <span class="scorecard-metric-label">Critical Time</span>
-              <span class="scorecard-metric-value sc-muted"><span class="counter" data-target="23" data-start="0" data-format="decimal">0</span></span>
+              <span class="scorecard-metric-value sc-muted"><span class="counter" data-target="8" data-start="0" data-format="decimal">0</span></span>
             </div>
             <div class="scorecard-metric">
               <span class="scorecard-metric-label">TWTE</span>
-              <span class="scorecard-metric-value sc-orange"><span class="counter" data-target="20133" data-start="0" data-format="integer">0</span></span>
+              <span class="scorecard-metric-value sc-orange"><span class="counter" data-target="19" data-start="0" data-format="decimal">0</span></span>
             </div>
             <div class="scorecard-metric">
               <span class="scorecard-metric-label">Attack Rate</span>
-              <span class="scorecard-metric-value sc-blue"><span class="counter" data-target="46" data-start="0" data-format="decimal">0</span></span>
+              <span class="scorecard-metric-value sc-blue"><span class="counter" data-target="0" data-start="0" data-format="decimal">0</span></span>
             </div>
             <div class="scorecard-metric">
               <span class="scorecard-metric-label">Cascade Depth</span>
@@ -105,9 +106,10 @@ import InstrumentPanel from '../components/InstrumentPanel.jsx';
             </div>
             <div class="scorecard-metric">
               <span class="scorecard-metric-label">Rapidity</span>
-              <span class="scorecard-metric-value sc-green"><span class="counter" data-target="8" data-start="0" data-format="integer">0</span> t</span>
+              <span class="scorecard-metric-value sc-green"><span class="counter" data-target="62" data-start="0" data-format="integer">0</span> t</span>
             </div>
           </div>
+          <p class="scorecard-note">One real run: PIBT, single-dock warehouse, 40 robots, 20% fail at tick 100, seed 42.</p>
         </div>
       </div>
     </section>
@@ -484,9 +486,9 @@ import InstrumentPanel from '../components/InstrumentPanel.jsx';
     .hero-text { max-width: 800px; pointer-events: auto; }
     .hero-title {
       font-family: var(--serif);
-      font-size: clamp(2rem, 4.5vw, 4rem);
+      font-size: clamp(2rem, 4vw, 3.5rem);
       color: var(--text); margin-bottom: 24px;
-      line-height: 1.05; letter-spacing: -1px;
+      line-height: 1.08; letter-spacing: -0.04em;
     }
     .hero-title em { color: var(--text); opacity: 0.35; font-style: italic; }
     .hero-subtitle {
@@ -619,6 +621,15 @@ import InstrumentPanel from '../components/InstrumentPanel.jsx';
       color: var(--text);
       opacity: 0.5;
       margin-bottom: 16px;
+    }
+    .scorecard-note {
+      font-family: var(--mono); font-size: 10px; color: var(--text-sec);
+      margin: 12px 0 0;
+    }
+    .hero-award {
+      display: inline-block; margin: 0 0 20px; font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.04em; color: var(--text); text-decoration: none;
+      border-bottom: 1px solid currentColor; padding-bottom: 2px;
     }
     .scorecard-grid {
       display: grid;

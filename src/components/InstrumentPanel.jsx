@@ -3,115 +3,129 @@ import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 const ITEMS = [
   { id: 'fault-taxonomy', num: '01', label: 'Fault Taxonomy',
     title: 'Four fault types, two categories',
-    desc: 'Each type tests a different failure mode.',
-    bullets: ['Recoverable: zone outage, intermittent latency', 'Permanent: burst failure, Weibull wear'],
+    desc: 'Each type tests a different failure mode. The lines show working robots over time.',
+    bullets: ['Permanent: burst failure, Weibull wear', 'Recoverable: zone outage, intermittent pauses', 'Control: one robot one tick late, the noise floor'],
     visual: 'taxonomy' },
   { id: 'baseline', num: '02', label: 'Baseline Model',
     title: 'Same seed, two runs',
-    desc: 'Every metric is the difference between a fault-free run and a faulted run sharing the same seed.',
-    bullets: ['Fault-free baseline computed in parallel', 'The difference is the result you measure', 'Same seed means an identical reference'],
+    desc: 'Every metric compares a faulted run with a fault-free twin that shares its seed: same map, robots and tasks.',
+    bullets: ['The two runs match exactly until the fault', 'The gap in tasks delivered is the fault’s cost', 'Each fault scored against its own twin'],
     visual: 'baseline' },
   { id: 'cascade', num: '03', label: 'Cascade Tracing',
-    title: 'Tracing which agents the fault touched',
-    desc: 'Each fault event walks the agent dependency graph to find the agents that depended on the failed one.',
-    bullets: ['Dependency graph rebuilt every tick', 'Breadth-first search measures depth and spread', 'Recovery time tracked per affected agent'],
+    title: 'Who was waiting on the failed robot',
+    desc: 'At the fault instant, MAFIS snapshots which robots wait on which, and walks the chain back from the failed one.',
+    bullets: ['Dependency graph taken at the fault instant', 'Breadth-first search gives depth and spread', 'Attack rate: share of untouched robots the chain reaches'],
     visual: 'cascade' },
   { id: 'reproducibility', num: '04', label: 'Reproducibility',
     title: 'Seeded determinism',
     desc: 'Same seed and config produce an identical simulation.',
-    bullets: ['One seeded RNG drives all random events', 'Bit-exact replay from any tick', 'Seed is exported with every result'],
+    bullets: ['Separate seeded streams for tasks, solver and faults', 'A zero-size fault leaves the run bit-identical', 'Seed is exported with every result'],
     visual: 'reproducibility' },
 ];
 
-const C = {
-  teal: '#3DB8E8', amber: '#E8862A', red: '#991B1B',
-  green: '#34D399', textSec: '#888', border: '#333',
-};
+// One palette for the four diagrams: neutral strokes use currentColor (light and dark themes),
+// red marks the fault, teal the fault-free reference.
+const C = { teal: '#3DB8E8', red: '#D2452E' };
+const MONO = { fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.06em' };
+const Svg = ({ children, h = 150 }) => (
+  <svg width="100%" style={{ maxWidth: 300 }} viewBox={`0 0 300 ${h}`} role="img" fill="none">{children}</svg>
+);
 
+// Working robots over time for each fault type: permanent ones never come back, recoverable ones do.
 function TaxonomySvg() {
-  return (
-    <svg width="280" height="120" viewBox="0 0 280 120">
-      <rect x="35" y="25" width="90" height="70" fill="none" stroke={C.teal} strokeWidth="2" />
-      <text x="80" y="63" textAnchor="middle" fill={C.teal} fontFamily="var(--mono)" fontSize="20" fontWeight="600">REC</text>
-      <text x="80" y="110" textAnchor="middle" fill={C.textSec} fontFamily="var(--mono)" fontSize="9">RECOVERABLE</text>
-      <rect x="155" y="25" width="90" height="70" fill="none" stroke={C.amber} strokeWidth="2" />
-      <text x="200" y="63" textAnchor="middle" fill={C.amber} fontFamily="var(--mono)" fontSize="20" fontWeight="600">PERM</text>
-      <text x="200" y="110" textAnchor="middle" fill={C.textSec} fontFamily="var(--mono)" fontSize="9">PERMANENT</text>
-    </svg>
-  );
-}
-
-function BaselineSvg() {
-  return (
-    <svg width="280" height="120" viewBox="0 0 280 120">
-      <text x="10" y="30" fill={C.green} fontFamily="var(--mono)" fontSize="9" opacity="0.7">BASELINE</text>
-      <line x1="70" y1="27" x2="260" y2="27" stroke={C.green} strokeWidth="2" opacity="0.6" />
-      {[90,120,150,180,210,240].map(x => (
-        <line key={x} x1={x} y1="22" x2={x} y2="32" stroke={C.green} strokeWidth="1" opacity="0.3" />
-      ))}
-      <text x="10" y="75" fill={C.amber} fontFamily="var(--mono)" fontSize="9" opacity="0.7">DEGRADED</text>
-      <line x1="70" y1="72" x2="150" y2="72" stroke={C.amber} strokeWidth="2" opacity="0.6" />
-      <rect x="148" y="60" width="4" height="24" fill={C.red} />
-      <text x="150" y="55" textAnchor="middle" fill={C.red} fontFamily="var(--mono)" fontSize="8">FAULT</text>
-      <polyline points="154,72 170,82 190,85 220,80 260,76" fill="none" stroke={C.amber} strokeWidth="2" opacity="0.6" />
-      <line x1="220" y1="27" x2="220" y2="80" stroke={C.textSec} strokeWidth="1" strokeDasharray="3,3" opacity="0.4" />
-      <text x="228" y="56" fill={C.textSec} fontFamily="var(--mono)" fontSize="9" opacity="0.6">delta</text>
-    </svg>
-  );
-}
-
-function CascadeSvg() {
-  return (
-    <svg width="280" height="140" viewBox="0 0 280 140">
-      <circle cx="140" cy="20" r="10" fill={C.red} opacity="0.8" />
-      <text x="140" y="24" textAnchor="middle" fill="#f0ede9" fontFamily="var(--mono)" fontSize="8" fontWeight="600">F</text>
-      <line x1="140" y1="30" x2="80" y2="60" stroke={C.amber} strokeWidth="1.5" opacity="0.5" />
-      <line x1="140" y1="30" x2="140" y2="60" stroke={C.amber} strokeWidth="1.5" opacity="0.5" />
-      <line x1="140" y1="30" x2="200" y2="60" stroke={C.amber} strokeWidth="1.5" opacity="0.5" />
-      {[80,140,200].map((cx, i) => (
-        <g key={i}>
-          <circle cx={cx} cy="65" r="8" fill="none" stroke={C.amber} strokeWidth="1.5" opacity="0.6" />
-          <text x={cx} y="68" textAnchor="middle" fill={C.amber} fontFamily="var(--mono)" fontSize="7">A{i+1}</text>
-        </g>
-      ))}
-      <line x1="80" y1="73" x2="50" y2="100" stroke={C.teal} strokeWidth="1" opacity="0.4" />
-      <line x1="80" y1="73" x2="110" y2="100" stroke={C.teal} strokeWidth="1" opacity="0.4" />
-      <line x1="200" y1="73" x2="230" y2="100" stroke={C.teal} strokeWidth="1" opacity="0.4" />
-      {[[50,'A4'],[110,'A5'],[230,'A6']].map(([cx, label]) => (
-        <g key={label}>
-          <circle cx={cx} cy="105" r="6" fill="none" stroke={C.teal} strokeWidth="1" opacity="0.4" />
-          <text x={cx} y="108" textAnchor="middle" fill={C.teal} fontFamily="var(--mono)" fontSize="6">{label}</text>
-        </g>
-      ))}
-      <text x="265" y="22" fill={C.textSec} fontFamily="var(--mono)" fontSize="8" opacity="0.5">d=0</text>
-      <text x="265" y="67" fill={C.textSec} fontFamily="var(--mono)" fontSize="8" opacity="0.5">d=1</text>
-      <text x="265" y="107" fill={C.textSec} fontFamily="var(--mono)" fontSize="8" opacity="0.5">d=2</text>
-    </svg>
-  );
-}
-
-function ReproducibilitySvg() {
-  const MiniGrid = ({ ox, oy }) => (
-    <g>
-      <rect x={ox} y={oy} width="60" height="50" fill="none" stroke={C.border} strokeWidth="1" />
-      {[0,1,2].map(r => [0,1,2,3].map(c => (
-        <rect key={`${r}-${c}`} x={ox + 5 + c * 14} y={oy + 5 + r * 14} width="10" height="10"
-          fill={C.teal} opacity={(r + c) % 3 === 0 ? 0.6 : 0.15} />
-      )))}
+  const T0 = 22, W = 116, H = 34, row = (y, d, label, color) => (
+    <g transform={`translate(${y[0]},${y[1]})`}>
+      <text x="0" y="-8" fill="currentColor" style={MONO}>{label}</text>
+      <line x1="0" y1={H} x2={W} y2={H} stroke="currentColor" strokeOpacity="0.25" />
+      <path d={d} stroke={color} strokeWidth="1.6" strokeLinejoin="round" />
     </g>
   );
+  const f = T0 + 18; // fault tick
   return (
-    <svg width="280" height="120" viewBox="0 0 280 120">
-      <rect x="10" y="30" width="80" height="30" fill="none" stroke={C.green} strokeWidth="1.5" />
-      <text x="50" y="50" textAnchor="middle" fill={C.green} fontFamily="var(--mono)" fontSize="11">seed: 42</text>
-      <line x1="90" y1="40" x2="110" y2="40" stroke={C.textSec} strokeWidth="1" opacity="0.5" />
-      <line x1="90" y1="50" x2="110" y2="75" stroke={C.textSec} strokeWidth="1" opacity="0.5" />
-      <MiniGrid ox={115} oy={15} />
-      <text x="145" y="78" textAnchor="middle" fill={C.textSec} fontFamily="var(--mono)" fontSize="8">RUN 1</text>
-      <text x="195" y="45" textAnchor="middle" fill={C.green} fontFamily="var(--mono)" fontSize="18" opacity="0.7">=</text>
-      <MiniGrid ox={210} oy={15} />
-      <text x="240" y="78" textAnchor="middle" fill={C.textSec} fontFamily="var(--mono)" fontSize="8">RUN 2</text>
-    </svg>
+    <Svg h={170}>
+      <text x="20" y="12" fill="currentColor" opacity="0.45" style={MONO}>PERMANENT</text>
+      {row([20, 38], `M0,4 H${f} V18 H${W}`, 'Burst', 'currentColor')}
+      {row([164, 38], `M0,4 H${f} V9 H${f + 18} V15 H${f + 34} V22 H${f + 52} V27 H${W}`, 'Wear', 'currentColor')}
+      <text x="20" y="98" fill={C.red} opacity="0.8" style={MONO}>RECOVERABLE</text>
+      {row([20, 124], `M0,4 H${f} V16 H${f + 40} V4 H${W}`, 'Zone outage', C.red)}
+      {row([164, 124], `M0,4 H${f - 12} V10 H${f - 4} V4 H${f + 22} V10 H${f + 30} V4 H${f + 56} V10 H${f + 62} V4 H${W}`, 'Intermittent', C.red)}
+    </Svg>
+  );
+}
+
+// Cumulative tasks: one line until the fault, then the faulted run falls behind its twin.
+function BaselineSvg() {
+  const x0 = 30, x1 = 222, yb = 120, fx = 100;
+  const base = `M${x0},${yb} L${fx},88 L${x1},22`;
+  const fault = `M${fx},88 L${x1},52`;
+  return (
+    <Svg h={145}>
+      <line x1={x0} y1={yb} x2={x1} y2={yb} stroke="currentColor" strokeOpacity="0.3" />
+      <line x1={x0} y1={yb} x2={x0} y2="14" stroke="currentColor" strokeOpacity="0.3" />
+      <path d={`M${fx},88 L${x1},22 L${x1},52 Z`} fill={C.red} fillOpacity="0.12" />
+      <path d={base} stroke={C.teal} strokeWidth="1.8" />
+      <path d={fault} stroke={C.red} strokeWidth="1.8" />
+      <line x1={fx} y1="14" x2={fx} y2={yb} stroke={C.red} strokeDasharray="3 3" strokeOpacity="0.7" />
+      <text x={fx + 5} y="22" fill={C.red} style={MONO}>FAULT</text>
+      <text x={x1 + 8} y="26" fill={C.teal} style={MONO}>TWIN</text>
+      <text x={x1 + 8} y="56" fill={C.red} style={MONO}>FAULTED</text>
+      <text x={x1 + 8} y="41" fill="currentColor" opacity="0.55" style={MONO}>↕ COST</text>
+      <text x={x0} y={yb + 16} fill="currentColor" opacity="0.5" style={MONO}>TICKS →</text>
+      <text x={x0 - 6} y="20" textAnchor="end" fill="currentColor" opacity="0.5" style={MONO} transform={`rotate(-90 ${x0 - 6} 20)`}>TASKS</text>
+    </Svg>
+  );
+}
+
+// Robots in a corridor: each waits for the one ahead; the chain from the failed robot sets depth and spread.
+function CascadeSvg() {
+  const xs = [250, 196, 142, 88, 34], y = 70, r = 13;
+  return (
+    <Svg h={140}>
+      <line x1="16" y1={y + 22} x2="284" y2={y + 22} stroke="currentColor" strokeOpacity="0.2" />
+      {xs.map((x, i) => (
+        <g key={i}>
+          <rect x={x - r} y={y - r} width={2 * r} height={2 * r} rx="4"
+            stroke={i === 0 ? C.red : 'currentColor'} fill={i === 0 ? C.red : 'none'} fillOpacity={i === 0 ? 0.9 : 0}
+            strokeOpacity={i === 0 ? 1 : 0.7} />
+          <text x={x} y={y + 42} textAnchor="middle" fill={i === 0 ? C.red : 'currentColor'} opacity={i === 0 ? 1 : 0.6} style={MONO}>
+            {i === 0 ? 'FAILED' : `d=${i}`}
+          </text>
+          {i > 0 && (
+            <g stroke="currentColor" strokeOpacity="0.6">
+              <line x1={x + r + 4} y1={y} x2={xs[i - 1] - r - 6} y2={y} />
+              <path d={`M${xs[i - 1] - r - 10},${y - 4} L${xs[i - 1] - r - 5},${y} L${xs[i - 1] - r - 10},${y + 4}`} />
+            </g>
+          )}
+        </g>
+      ))}
+      <text x="16" y="28" fill="currentColor" opacity="0.5" style={MONO}>WAITS FOR →</text>
+      <text x="284" y="28" textAnchor="end" fill="currentColor" opacity="0.5" style={MONO}>DEPTH 4 · SPREAD 5</text>
+    </Svg>
+  );
+}
+
+// One seed feeds separate streams; two runs from the same seed trace the same path.
+function ReproducibilitySvg() {
+  const streams = ['TASKS', 'SOLVER', 'FAULTS'];
+  const path = 'M0,30 H18 V12 H40 V24 H58 V6 H76';
+  return (
+    <Svg h={140}>
+      <rect x="14" y="56" width="62" height="26" rx="3" stroke={C.teal} />
+      <text x="45" y="73" textAnchor="middle" fill={C.teal} style={MONO}>SEED 42</text>
+      {streams.map((s, i) => (
+        <g key={s}>
+          <path d={`M76,69 C96,69 96,${32 + i * 37} 116,${32 + i * 37}`} stroke="currentColor" strokeOpacity="0.35" />
+          <text x="122" y={35 + i * 37} fill="currentColor" opacity="0.65" style={MONO}>{s}</text>
+        </g>
+      ))}
+      {[30, 96].map((y, i) => (
+        <g key={i} transform={`translate(200,${y})`}>
+          <path d={path} stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+          <text x="0" y="-4" fill="currentColor" opacity="0.5" style={MONO}>{`RUN ${i + 1}`}</text>
+        </g>
+      ))}
+      <text x="238" y="80" textAnchor="middle" fill={C.teal} style={{ ...MONO, fontSize: 18 }}>=</text>
+    </Svg>
   );
 }
 
@@ -176,6 +190,7 @@ function Card({ item, index, isDark, stickyTop }) {
             padding: 24,
             borderRight: `1px solid ${borderColor}`,
             overflow: 'hidden',
+            color: textColor,
           }}
             className="card-visual-col"
           >
